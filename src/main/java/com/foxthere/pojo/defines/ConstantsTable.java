@@ -18,7 +18,7 @@ public class ConstantsTable {
     public static final int CRANE_INITIAL_NUM = 1;
 
     /** 起重机的效率，每处理一件所需的平均时间 30箱/小时 ==> 每箱2分钟（单位：ms）*/
-    public static final int CRANE_REQUIRED_PROCESS_ONE_PIECE = 2 * 60 * 1000;
+    public static final int CRANE_REQUIRED_PROCESS_ONE_TEU = 2 * 60 * 1000;
 
     /** 起重机的效率，每处理一吨所需的平均时间 1000吨/小时 ==> 每吨0.06分钟 ==> 3600ms/t（单位：ms） */
     public static final int CRANE_REQUIRED_PROCESS_ONE_TON = 3600;
@@ -59,7 +59,10 @@ public class ConstantsTable {
     /** 船舶尾部的n位随机数字 */
     public static final int NUM_DIGITS_END_OF_NAME = 3;
 
+    /** 时间格式 */
+    public static final String TIME_TYPE = "MM:dd:HH:mm";
+
     /** 表头底线 */
-    public static final String TABLE_LINE = "------------------------------------------------------------------";
+    public static final String TABLE_LINE = "--------------------------------------------------------------------------------------------------------";
 
 }

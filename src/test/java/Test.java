@@ -1,5 +1,7 @@
 import com.foxthere.pojo.defines.ConstantsTable;
+import com.foxthere.pojo.defines.Freighter;
 import com.foxthere.pojo.defines.TypeGoods;
+import com.foxthere.service.service1.FreighterTimetable;
 
 import java.util.Locale;
 import java.util.Random;
@@ -14,12 +16,13 @@ import java.util.Random;
  * @Versions: v0.1
  * @Github ：https://github.com/NekoSilverFox
  */
-
 public class Test {
+
     public static void main(String[] args) {
-        for (int i = 0; i < 100000; i++) {
-            int num = new Random().nextInt(ConstantsTable.MAX_TEU_TRANSPORTED - ConstantsTable.MIN_TEU_TRANSPORTED + 1) + ConstantsTable.MIN_TEU_TRANSPORTED;
-            System.out.println(num);
-        }
+        FreighterTimetable freighterTimetable = new FreighterTimetable();
+        freighterTimetable.createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION);
+
+//        FreighterTimetable.printFreighterList(freighterTimetable, ConstantsTable.TIME_TYPE);
+        freighterTimetable.printFreighterList(ConstantsTable.TIME_TYPE);
     }
 }
