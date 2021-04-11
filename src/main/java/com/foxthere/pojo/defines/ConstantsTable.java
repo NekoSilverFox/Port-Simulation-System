@@ -39,10 +39,10 @@ public class ConstantsTable {
     public static final int FINE_EVERY_HOUR = 100;
 
     /** 模拟船舶到港时间的最大提前偏差，-7 天，单位（毫秒 ms） */
-    public static final long EARLY_ARRIVAL_TIME_MS = -7L * 24 * 60 * 60 * 1000;
+    public static final long EARLY_ARRIVAL_TIME = 7L * 24 * 60 * 60 * 1000;
 
     /** 模拟船舶到港时间的最大延后偏差，+7 天，单位（毫秒 ms） */
-    public static final long DELAYED_ARRIVAL_TIME_MS = +7L * 24 * 60 * 60 * 1000;
+    public static final long DELAYED_ARRIVAL_TIME = +7L * 24 * 60 * 60 * 1000;
 
     /** 模拟船舶卸货完成的最大提前偏差，0 分，单位（毫秒 ms） */
     public static final long EARLY_TIME_COMPLETION_UNLOADING = 0;
@@ -55,5 +55,11 @@ public class ConstantsTable {
 
     /** 模拟的时长，30 天，单位（毫秒 ms） */
     public static final long DURATION_SIMULATION = 30L * 24 * 60 * 60 * 1000;
+
+    /** 船舶尾部的n位随机数字 */
+    public static final int NUM_DIGITS_END_OF_NAME = 3;
+
+    /** 表头底线 */
+    public static final String TABLE_LINE = "------------------------------------------------------------------";
 
 }
