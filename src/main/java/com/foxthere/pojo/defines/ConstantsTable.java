@@ -60,7 +60,7 @@ public class ConstantsTable {
     public static final int NUM_DIGITS_END_OF_NAME = 3;
 
     /** 时间格式 */
-    public static final String TIME_TYPE = "MM:dd:HH:mm";
+    public static final String TIME_TYPE = "MM月dd日 HH:mm";
 
     /** 表头底线 */
     public static final String TABLE_LINE = "--------------------------------------------------------------------------------------------------------";

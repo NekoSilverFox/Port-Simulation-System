@@ -15,18 +15,28 @@ import com.foxthere.pojo.defines.Freighter;
 import com.foxthere.pojo.defines.TypeGoods;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 public class FreighterTimetable {
     /** 储存货轮的 ArrayList，存储有所有类型的货轮 */
     private ArrayList<Freighter> freighterList;
 
+    /** 集装箱货船 */
+    private ArrayList<Freighter> containershipList;
+
+    /** 散货船 */
+    private ArrayList<Freighter> bulkCarrierList;
+
+    /** 液货船 */
+    private ArrayList<Freighter> tankerList;
+
     // TODO 增加几种船舶的队列
 
     public FreighterTimetable() {
         this.freighterList = new ArrayList<>();
+        this.containershipList = new ArrayList<>();
+        this.bulkCarrierList = new ArrayList<>();
+        this.tankerList = new ArrayList<>();
     }
 
     public FreighterTimetable(ArrayList<Freighter> freighterList) {
@@ -41,16 +51,37 @@ public class FreighterTimetable {
         this.freighterList = freighterList;
     }
 
-    /** TODO
+    /** TODO 排序
      * 添加一个货轮到表中
      * @param freighter 要添加的货轮
      */
     public void addFreighter(Freighter freighter) {
         if ((freighter == null) || freighter.isIncompleteInfo()) {
             throw new NullPointerException("[ERROR] Object freighter can not be null or incomplete information");
-        } else {
-            // 添加到容器中 TODO
         }
+
+        this.freighterList.add(freighter);
+
+        if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
+            this.containershipList.add(freighter);
+        } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
+            this.bulkCarrierList.add(freighter);
+        } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
+            this.tankerList.add(freighter);
+        } else {
+            throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+        }
+    }
+
+
+    /**
+     * 默认排序方式，按照【实际】的抵达时间
+     * @param l
+     * @param r
+     * @return
+     */
+    private int defaultSortingRules(Freighter l, Freighter r) {
+        return (int) (l.getActualArrivalTime() - r.getActualArrivalTime());
     }
 
     /**
@@ -95,6 +126,18 @@ public class FreighterTimetable {
         return this.freighterList.get(index);
     }
 
+    public ArrayList<Freighter> getContainershipList() {
+        return containershipList;
+    }
+
+    public ArrayList<Freighter> getBulkCarrierList() {
+        return bulkCarrierList;
+    }
+
+    public ArrayList<Freighter> getTankerList() {
+        return tankerList;
+    }
+
     /**
      * 生成船的时刻表
      * TODO 实现用动态规划生成时间等待
@@ -116,15 +159,27 @@ public class FreighterTimetable {
             freighter.setTypeGoods(InfoGenerator.randomTypeGoods());
             freighter.setEstimatedArrivalTime(nowTime);
             freighter.setActualArrivalTime(InfoGenerator.randomActualArrivalTime(freighter.getEstimatedArrivalTime()));
+
             if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
+                this.containershipList.add(freighter);
+
                 freighter.setWeightOrNumber(InfoGenerator.randomTEUNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TEU));
-            } else {
+            } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
+                this.bulkCarrierList.add(freighter);
+
+                freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
+                freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
+                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
+            } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
+                this.tankerList.add(freighter);
+
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
             }
+
             freighter.setActualStopTime(InfoGenerator.randomActualStopTime(freighter.getEstimatedStopTime()));
 
             int stayTime_Hour = (int) ((freighter.getActualStopTime() - freighter.getEstimatedStopTime()) / 1000 / 60 / 60);
@@ -138,15 +193,39 @@ public class FreighterTimetable {
             nowTime += freighterArrivalInterval;
         }
 
+        // 按照【实际】到达日期将其排序
+        this.freighterList.sort(this::defaultSortingRules);
+        this.containershipList.sort(this::defaultSortingRules);
+        this.bulkCarrierList.sort(this::defaultSortingRules);
+        this.tankerList.sort(this::defaultSortingRules);
+
         System.out.println("[INFO] Successful to create freighter time table");
         return this.freighterList;
     }
 
-    public void printFreighterList(String timeType) {
-        if (this.freighterList.size() == 0) {
+    public void printAllFreighterTimetable(String timeType) {
+        FreighterTimetable.printFreighterTimetable(this.freighterList, timeType);
+    }
+
+    public void printContainershipTimetable(String timeType) {
+        FreighterTimetable.printFreighterTimetable(this.containershipList, timeType);
+    }
+
+    public void printBulkCarrierTimetable(String timeType) {
+        FreighterTimetable.printFreighterTimetable(this.bulkCarrierList, timeType);
+    }
+
+    public void printTankerTimetable(String timeType) {
+        FreighterTimetable.printFreighterTimetable(this.tankerList, timeType);
+    }
+
+    public static void printFreighterTimetable(ArrayList<Freighter> freighterTimetable, String timeType) {
+        if ((freighterTimetable == null) || (freighterTimetable.size() == 0)) {
             System.out.println("[INFO] Freighter time table is empty");
             return;
         }
+
+        System.out.println(ConstantsTable.TABLE_LINE);
 
         System.out.println(String.format("%-13s", "Name")
                 + String.format("%-20s", "Type goods")
@@ -157,40 +236,13 @@ public class FreighterTimetable {
 
         System.out.println(ConstantsTable.TABLE_LINE);
 
-        for (Freighter freighter : this.freighterList) {
+        for (Freighter freighter : freighterTimetable) {
             System.out.println(String.format("%-13s", freighter.getName())
                     + String.format("%-20s", freighter.getTypeGoods().toString().toLowerCase(Locale.ROOT))
                     + String.format("%-20s", new SimpleDateFormat(timeType).format(new Date(freighter.getActualArrivalTime())))
                     + String.format("%-25s", freighter.getEstimatedStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", freighter.getActualStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", "$ " + freighter.getFine()));
-        }
-
-        System.out.println(ConstantsTable.TABLE_LINE);
-    }
-
-    public static void printFreighterList(FreighterTimetable freighterTimetable, String timeType) {
-        if ((freighterTimetable == null) || (freighterTimetable.freighterList.size() == 0)) {
-            System.out.println("[INFO] Freighter time table is empty");
-            return;
-        }
-
-        System.out.println(String.format("%-13s", "Name")
-                + String.format("%-20s", "Type goods")
-                + String.format("%-20s", "Arrival time")
-                + String.format("%-25s", "Estimated stop time")
-                + String.format("%-20s", "Actual stop time")
-                + String.format("%-20s", "Fine"));
-
-        System.out.println(ConstantsTable.TABLE_LINE);
-
-        for (int i = 0; i < freighterTimetable.freighterNumber(); i++) {
-            System.out.println(String.format("%-13s", freighterTimetable.get(i).getName())
-                    + String.format("%-20s", freighterTimetable.get(i).getTypeGoods().toString().toLowerCase(Locale.ROOT))
-                    + String.format("%-20s", new SimpleDateFormat(timeType).format(new Date(freighterTimetable.get(i).getActualArrivalTime())))
-                    + String.format("%-25s", freighterTimetable.get(i).getEstimatedStopTime() / 1000 / 60 + " min")
-                    + String.format("%-20s", freighterTimetable.get(i).getActualStopTime() / 1000 / 60 + " min")
-                    + String.format("%-20s", "$ " + freighterTimetable.get(i).getFine()));
         }
 
         System.out.println(ConstantsTable.TABLE_LINE);

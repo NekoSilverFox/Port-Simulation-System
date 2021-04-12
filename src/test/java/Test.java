@@ -1,10 +1,5 @@
 import com.foxthere.pojo.defines.ConstantsTable;
-import com.foxthere.pojo.defines.Freighter;
-import com.foxthere.pojo.defines.TypeGoods;
 import com.foxthere.service.service1.FreighterTimetable;
-
-import java.util.Locale;
-import java.util.Random;
 
 /**
  * -*- coding: utf-8 -*-
@@ -23,6 +18,9 @@ public class Test {
         freighterTimetable.createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION);
 
 //        FreighterTimetable.printFreighterList(freighterTimetable, ConstantsTable.TIME_TYPE);
-        freighterTimetable.printFreighterList(ConstantsTable.TIME_TYPE);
+        freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
+        freighterTimetable.printContainershipTimetable(ConstantsTable.TIME_TYPE);
+        freighterTimetable.printBulkCarrierTimetable(ConstantsTable.TIME_TYPE);
+        freighterTimetable.printTankerTimetable(ConstantsTable.TIME_TYPE);
     }
 }
