@@ -34,7 +34,7 @@ public class InfoGenerator {
      * @return 处理货物需要的【理论】时间（ms）
      */
     public static long estimatedStopTime(int weightOrNumber, long craneEfficiency) {
-        return (long) weightOrNumber * craneEfficiency;
+        return (long) weightOrNumber * craneEfficiency;  // TODO 增加起重机数量（Max 2）
     }
 
 

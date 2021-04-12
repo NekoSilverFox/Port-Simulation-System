@@ -31,6 +31,7 @@ public class Test {
     public static void springTest() throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
 
+        // 生成并写入
 /*        JsonManager.jsonWriter(
                 context.getBean("freighterTimetable", FreighterTimetable.class)
                         .createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION),
@@ -57,6 +58,5 @@ public class Test {
 
         FreighterTimetable freighterTimetable = new FreighterTimetable(freighters);
         freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
-
     }
 }

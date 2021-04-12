@@ -52,15 +52,28 @@ public class Freighter {
     private long actualStopTime;
 
     /**
+     * 在队列中等待的时长
+     */
+    private long waitingTimeInQueue;
+
+    /**
+     * 是否完成了卸货，true代表完成了卸货，false代表没有
+     */
+    private boolean isUnload;
+
+    /**
      * 罚款 单位：美元
      */
     private int fine;
 
     public Freighter() {
+        this.waitingTimeInQueue = 0;
+        this.isUnload = false;
     }
 
     public Freighter(String name, TypeGoods typeGoods, int weightOrNumber, long estimatedArrivalTime,
-                     long actualArrivalTime, long estimatedStopTime, long actualStopTime, int fine) {
+                     long actualArrivalTime, long estimatedStopTime, long actualStopTime, long waitingTimeInQueue,
+                     boolean isUnload, int fine) {
         this.name = name;
         this.typeGoods = typeGoods;
         this.weightOrNumber = weightOrNumber;
@@ -68,6 +81,8 @@ public class Freighter {
         this.actualArrivalTime = actualArrivalTime;
         this.estimatedStopTime = estimatedStopTime;
         this.actualStopTime = actualStopTime;
+        this.waitingTimeInQueue = waitingTimeInQueue;
+        this.isUnload = isUnload;
         this.fine = fine;
     }
 
@@ -101,6 +116,8 @@ public class Freighter {
                 ", actualArrivalTime=" + actualArrivalTime +
                 ", estimatedStopTime=" + estimatedStopTime +
                 ", actualStopTime=" + actualStopTime +
+                ", waitTime=" + waitingTimeInQueue +
+                ", isUnload=" + isUnload +
                 ", fine=" + fine +
                 '}';
     }
@@ -188,6 +205,22 @@ public class Freighter {
             throw new IndexOutOfBoundsException("[ERROR] Actual stop time can not small than 0");
         }
         this.actualStopTime = actualStopTime;
+    }
+
+    public long getWaitingTimeInQueue() {
+        return waitingTimeInQueue;
+    }
+
+    public void setWaitingTimeInQueue(long waitingTimeInQueue) {
+        this.waitingTimeInQueue = waitingTimeInQueue;
+    }
+
+    public boolean isUnload() {
+        return isUnload;
+    }
+
+    public void setUnload(boolean unload) {
+        isUnload = unload;
     }
 
     public int getFine() {

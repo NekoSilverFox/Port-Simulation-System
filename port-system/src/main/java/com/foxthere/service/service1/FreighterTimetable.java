@@ -21,16 +21,24 @@ import java.util.Locale;
 import java.util.UnknownFormatConversionException;
 
 public class FreighterTimetable {
-    /** 储存货轮的 ArrayList，存储有所有类型的货轮 */
+    /**
+     * 储存货轮的 ArrayList，存储有所有类型的货轮
+     */
     private ArrayList<Freighter> freighterList;
 
-    /** 集装箱货船 */
+    /**
+     * 集装箱货船
+     */
     private ArrayList<Freighter> containershipList;
 
-    /** 散货船 */
+    /**
+     * 散货船
+     */
     private ArrayList<Freighter> bulkCarrierList;
 
-    /** 液货船 */
+    /**
+     * 液货船
+     */
     private ArrayList<Freighter> tankerList;
 
     public FreighterTimetable() {
@@ -51,12 +59,32 @@ public class FreighterTimetable {
 
     public void setFreighterList(ArrayList<Freighter> freighterList) {
         this.freighterList = freighterList;
+        this.containershipList = new ArrayList<>();
+        this.bulkCarrierList = new ArrayList<>();
+        this.tankerList = new ArrayList<>();
+
+        for (Freighter freighter : freighterList) {
+            if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
+                containershipList.add(freighter);
+            } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
+                bulkCarrierList.add(freighter);
+            } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
+                tankerList.add(freighter);
+            } else {
+                throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+            }
+        }
+
         this.freighterList.sort(this::defaultSortingRules);
+        this.containershipList.sort(this::defaultSortingRules);
+        this.bulkCarrierList.sort(this::defaultSortingRules);
+        this.tankerList.sort(this::defaultSortingRules);
     }
 
 
     /**
      * 添加一个货轮到表中
+     *
      * @param freighter 要添加的货轮
      */
     public void addFreighter(Freighter freighter) {
@@ -87,6 +115,7 @@ public class FreighterTimetable {
 
     /**
      * 默认排序方式，按照【实际】的抵达时间
+     *
      * @param l 左值
      * @param r 右值
      * @return int 类型的排序规则（升序）
@@ -98,6 +127,7 @@ public class FreighterTimetable {
 
     /**
      * 获取货轮的总量（包含所有类型）
+     *
      * @return 获取货轮的总量（包含所有类型）
      */
     public int allFreighterNumber() {
@@ -107,6 +137,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【集装箱】货轮的总量
+     *
      * @return 货轮的总量（集装箱）
      */
     public int containershipNumber() {
@@ -116,6 +147,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【散货船】的总量
+     *
      * @return 获取货轮的总量（散货船）
      */
     public int bulkCarrierNumber() {
@@ -125,6 +157,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【液货船】的总量
+     *
      * @return 获取货轮的总量（液货船）
      */
     public int tankerNumber() {
@@ -134,6 +167,7 @@ public class FreighterTimetable {
 
     /**
      * 平均等待时长
+     *
      * @return 平均等待时长
      */
     public long averageWaitingTime() {
@@ -144,6 +178,7 @@ public class FreighterTimetable {
 
     /**
      * 所有类型货轮的总罚款
+     *
      * @return 总罚款
      */
     public int allFreighterTotalFine() {
@@ -159,6 +194,7 @@ public class FreighterTimetable {
 
     /**
      * 所有集装箱货船的总罚款
+     *
      * @return 总罚款
      */
     public int containershipTotalFine() {
@@ -174,6 +210,7 @@ public class FreighterTimetable {
 
     /**
      * 所有散货船的总罚款
+     *
      * @return 总罚款
      */
     public int bulkCarrierTotalFine() {
@@ -189,6 +226,7 @@ public class FreighterTimetable {
 
     /**
      * 所有液货船的总罚款
+     *
      * @return 总罚款
      */
     public int tankerTotalFine() {
@@ -204,6 +242,7 @@ public class FreighterTimetable {
 
     /**
      * 按照索引从所有货轮列表中获取货轮
+     *
      * @param index
      * @return
      */
@@ -230,6 +269,7 @@ public class FreighterTimetable {
     /**
      * 生成船的时刻表
      * TODO 实现用动态规划生成时间等待
+     *
      * @param freighterArrivalInterval 平均每隔多久到一艘船
      * @param durationSimulation       模拟的时长
      * @return 生成的船的时刻表
@@ -276,7 +316,9 @@ public class FreighterTimetable {
 
             freighter.setActualStopTime(InfoGenerator.randomActualStopTime(freighter.getEstimatedStopTime()));
 
-            int stayTime_Hour = (int) ((freighter.getActualStopTime() - freighter.getEstimatedStopTime()) / 1000 / 60 / 60);
+            // 与预计完成卸货时间的差距（单位：ms）
+            long unloadDelayTime = freighter.getActualStopTime() - freighter.getEstimatedStopTime();
+            int stayTime_Hour = (int) (unloadDelayTime / 1000 / 60 / 60);
             if (stayTime_Hour <= 0) {
                 freighter.setFine(0);
             } else {
@@ -300,6 +342,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【所有】货轮的时间表
+     *
      * @param timeType 显示时间的格式
      */
     public void printAllFreighterTimetable(String timeType) {
@@ -309,6 +352,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【集装箱】货轮的时间表
+     *
      * @param timeType 显示时间的格式
      */
     public void printContainershipTimetable(String timeType) {
@@ -318,6 +362,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【散货船】的时间表
+     *
      * @param timeType 显示时间的格式
      */
     public void printBulkCarrierTimetable(String timeType) {
@@ -327,6 +372,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【液货船】的时间表
+     *
      * @param timeType 显示时间的格式
      */
     public void printTankerTimetable(String timeType) {
@@ -335,8 +381,9 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印指定类型货轮的时间表
+     *
      * @param freighterTimetable 存储货轮的 ArrayList
-     * @param timeType 显示时间的格式
+     * @param timeType           显示时间的格式
      */
     public static void printFreighterTimetable(ArrayList<Freighter> freighterTimetable, String timeType) {
         if ((freighterTimetable == null) || (freighterTimetable.size() == 0)) {
@@ -361,7 +408,8 @@ public class FreighterTimetable {
                     + String.format("%-20s", new SimpleDateFormat(timeType).format(new Date(freighter.getActualArrivalTime())))
                     + String.format("%-25s", freighter.getEstimatedStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", freighter.getActualStopTime() / 1000 / 60 + " min")
-                    + String.format("%-20s", "$ " + freighter.getFine()));
+                    + String.format("%-20s", "$ " + freighter.getFine())
+            );
         }
 
         System.out.println(ConstantsTable.TABLE_LINE);
