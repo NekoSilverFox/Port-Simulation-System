@@ -1,7 +1,9 @@
 import com.foxthere.pojo.defines.ConstantsTable;
 import com.foxthere.pojo.defines.Freighter;
+import com.foxthere.pojo.defines.StatisticalResults;
 import com.foxthere.service.service1.FreighterTimetable;
 import com.foxthere.service.service2.JsonManager;
+import com.foxthere.service.service3.StatisticalModels;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -26,7 +28,9 @@ public class Test {
 //        write();
 //        read();
         springTest();
+
     }
+
 
     public static void springTest() throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
@@ -42,6 +46,46 @@ public class Test {
         freighterTimetable.setFreighterList(JsonManager.jsonReader(ConstantsTable.JSON_FILE_PATH));
 
         freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
+
+        System.out.println("\n\n");
+
+        ArrayList<Freighter> containerships = freighterTimetable.getContainershipList();
+        int minCraneContainerships = StatisticalModels.getMinCraneNumber(containerships);
+        StatisticalResults containershipsResults = StatisticalModels.getStatistics(containerships);
+        containershipsResults.setNumCrane(minCraneContainerships);
+
+        ArrayList<Freighter> bulkCarriers = freighterTimetable.getBulkCarrierList();
+        int minCraneBulkCarriers = StatisticalModels.getMinCraneNumber(bulkCarriers);
+        StatisticalResults bulkCarriersResults = StatisticalModels.getStatistics(bulkCarriers);
+        bulkCarriersResults.setNumCrane(minCraneBulkCarriers);
+
+        ArrayList<Freighter> tankers = freighterTimetable.getTankerList();
+        int minCraneTankers = StatisticalModels.getMinCraneNumber(tankers);
+        StatisticalResults tankersResults = StatisticalModels.getStatistics(tankers);
+        tankersResults.setNumCrane(minCraneTankers);
+
+        StatisticalResults totalResults = new StatisticalResults(
+                minCraneContainerships + minCraneBulkCarriers + minCraneTankers,
+                containershipsResults.getNumFreighters() + bulkCarriersResults.getNumFreighters() + tankersResults.getNumFreighters(),
+                containershipsResults.getAverageWaitingTimeInQueue() + bulkCarriersResults.getAverageWaitingTimeInQueue() + tankersResults.getAverageWaitingTimeInQueue(),
+                containershipsResults.getMaxUnloadingDelayTime() + bulkCarriersResults.getMaxUnloadingDelayTime() + tankersResults.getMaxUnloadingDelayTime(),
+                containershipsResults.getAverageUnloadingDelayTime() + bulkCarriersResults.getAverageUnloadingDelayTime() + tankersResults.getAverageUnloadingDelayTime(),
+                containershipsResults.getAverageTimeOfUnloading() + bulkCarriersResults.getAverageTimeOfUnloading() + tankersResults.getAverageTimeOfUnloading(),
+                containershipsResults.getTotalFine() + bulkCarriersResults.getTotalFine() + tankersResults.getTotalFine()
+        );
+
+        StatisticalModels.printStatistics(containershipsResults, "Results-Containerships");
+        System.out.println("\n");
+
+        StatisticalModels.printStatistics(bulkCarriersResults, "Results-BulkCarriers");
+        System.out.println("\n");
+
+        StatisticalModels.printStatistics(tankersResults, "Results-Tankers");
+        System.out.println("\n");
+
+        StatisticalModels.printStatistics(totalResults, "Results-AllFreighters");
+        System.out.println("\n");
+
     }
 
     public static void write() throws IOException {

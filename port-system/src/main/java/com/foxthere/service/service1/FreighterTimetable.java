@@ -408,7 +408,7 @@ public class FreighterTimetable {
                     + String.format("%-20s", new SimpleDateFormat(timeType).format(new Date(freighter.getActualArrivalTime())))
                     + String.format("%-25s", freighter.getEstimatedStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", freighter.getActualStopTime() / 1000 / 60 + " min")
-                    + String.format("%-20s", "$ " + freighter.getFine())
+                    + String.format("%-20s", "$" + freighter.getFine())
             );
         }
 
