@@ -10,9 +10,11 @@
  */
 package com.foxthere.pojo.defines;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Freighter {
     /**
      * 货船的名字
@@ -57,7 +59,8 @@ public class Freighter {
     public Freighter() {
     }
 
-    public Freighter(String name, TypeGoods typeGoods, int weightOrNumber, long estimatedArrivalTime, long actualArrivalTime, long estimatedStopTime, long actualStopTime, int fine) {
+    public Freighter(String name, TypeGoods typeGoods, int weightOrNumber, long estimatedArrivalTime,
+                     long actualArrivalTime, long estimatedStopTime, long actualStopTime, int fine) {
         this.name = name;
         this.typeGoods = typeGoods;
         this.weightOrNumber = weightOrNumber;
@@ -86,6 +89,20 @@ public class Freighter {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Freighter{" +
+                "name='" + name + '\'' +
+                ", typeGoods=" + typeGoods +
+                ", weightOrNumber=" + weightOrNumber +
+                ", estimatedArrivalTime=" + estimatedArrivalTime +
+                ", actualArrivalTime=" + actualArrivalTime +
+                ", estimatedStopTime=" + estimatedStopTime +
+                ", actualStopTime=" + actualStopTime +
+                ", fine=" + fine +
+                '}';
     }
 
     @Override

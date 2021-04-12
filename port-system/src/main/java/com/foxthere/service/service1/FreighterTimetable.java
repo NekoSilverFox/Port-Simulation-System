@@ -42,6 +42,7 @@ public class FreighterTimetable {
 
     public FreighterTimetable(ArrayList<Freighter> freighterList) {
         this.freighterList = freighterList;
+        this.freighterList.sort(this::defaultSortingRules);
     }
 
     public ArrayList<Freighter> getFreighterList() {
@@ -50,6 +51,7 @@ public class FreighterTimetable {
 
     public void setFreighterList(ArrayList<Freighter> freighterList) {
         this.freighterList = freighterList;
+        this.freighterList.sort(this::defaultSortingRules);
     }
 
 

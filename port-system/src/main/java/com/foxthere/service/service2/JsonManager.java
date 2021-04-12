@@ -12,15 +12,16 @@ package com.foxthere.service.service2;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foxthere.pojo.defines.Freighter;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 
 public class JsonManager {
-    public static <T> void jsonWriter(T obj, String filePath) throws IOException {
+    public static void jsonWriter(ArrayList<Freighter> freighterArrayList, String filePath) throws IOException {
         File file = new File(filePath);
 
         if (filePath.isEmpty() || !filePath.toLowerCase(Locale.ROOT).endsWith(".json")) {
@@ -44,10 +45,11 @@ public class JsonManager {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new FileWriter(filePath), obj);
+        mapper.writeValue(new FileWriter(filePath), freighterArrayList);
     }
 
-    public static <T> T jsonReader(String filePath) throws IOException {
+
+    public static ArrayList<Freighter> jsonReader(String filePath) throws IOException {
         FileReader fileReader = new FileReader(filePath);
         int len = 0;
         char[] chars = new char[1024];
@@ -57,11 +59,11 @@ public class JsonManager {
             stringBuffer.append(new String(chars, 0, len));
         }
 
-        System.out.println("读取到的字符串：" + stringBuffer.toString());  // TODO 测试完 注释掉
+        // System.out.println("读取到的字符串：" + stringBuffer.toString());
 
         ObjectMapper mapper = new ObjectMapper();
-        T obj = mapper.readValue(stringBuffer.toString(), new TypeReference<T>() {});
+        ArrayList<Freighter> freightersList = mapper.readValue(stringBuffer.toString(), new TypeReference<ArrayList<Freighter>>() {});
 
-        return obj;
+        return freightersList;
     }
 }
