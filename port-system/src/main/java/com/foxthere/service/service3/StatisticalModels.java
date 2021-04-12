@@ -52,6 +52,10 @@ public class StatisticalModels {
 
         // 上一个
         int lastTotalFines = 0;
+
+        // 在外部创建一个锁对象
+        Object lockObj = new Object();
+
         while (lastTotalFines < currentTotalFines) {
             lastTotalFines = currentTotalFines;
 
@@ -71,15 +75,22 @@ public class StatisticalModels {
                 int index = i;
 
                 long finalWaitingTime = waitingTime;
-                executorService.submit(() -> {
-                    if (finalWaitingTime > 0 && (containershipList.size() > nextShipOnThisThread)) {
-                        containershipList.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingTime);
-                        // 原来就已经有的罚金（因为起重机的超时工作）
-                        int fineAlreadyHave = containershipList.get(index).getFine();
-                        containershipList.get(nextShipOnThisThread).setFine((int) (finalWaitingTime / 1000 / 60 / 60 * 100 + fineAlreadyHave));
-                    }
+                synchronized (lockObj) {
+                    executorService.submit(() -> {
+                        if (finalWaitingTime > 0 && (containershipList.size() > nextShipOnThisThread)) {
+                            containershipList.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingTime);
+                            // 原来就已经有的罚金（因为起重机的超时工作）
+                            int fineAlreadyHave = containershipList.get(index).getFine();
+                            containershipList.get(nextShipOnThisThread).setFine((int) (finalWaitingTime / 1000 / 60 / 60 * 100 + fineAlreadyHave));
+                        }
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
-                });
+                    });
+                }
             }
 
             // 统计总罚款
@@ -89,7 +100,10 @@ public class StatisticalModels {
 
             numThread++;
         }
+
+        System.out.println("集装箱类的船舶数量：" + containershipList.size());
         System.out.println("最优起重机数量：" + (numThread - 1));
         System.out.println("总罚金 + 起重机数量：" + lastTotalFines);
+        System.exit(0);
     }
 }
