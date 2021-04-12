@@ -15,7 +15,10 @@ import com.foxthere.pojo.defines.Freighter;
 import com.foxthere.pojo.defines.TypeGoods;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UnknownFormatConversionException;
 
 public class FreighterTimetable {
     /** 储存货轮的 ArrayList，存储有所有类型的货轮 */

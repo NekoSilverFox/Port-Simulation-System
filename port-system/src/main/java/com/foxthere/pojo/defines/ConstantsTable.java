@@ -59,6 +59,9 @@ public class ConstantsTable {
     /** 船舶尾部的n位随机数字 */
     public static final int NUM_DIGITS_END_OF_NAME = 3;
 
+    /** 默认Json文件的存储位置 */
+    public static final String JSON_FILE_PATH = "port-system\\src\\main\\java\\com\\foxthere\\data\\TimeTable.json";
+
     /** 时间格式 */
     public static final String TIME_TYPE = "MM月dd日 HH:mm";
 

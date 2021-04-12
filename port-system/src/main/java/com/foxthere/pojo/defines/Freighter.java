@@ -10,6 +10,7 @@
  */
 package com.foxthere.pojo.defines;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Freighter {
