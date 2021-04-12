@@ -30,8 +30,6 @@ public class FreighterTimetable {
     /** 液货船 */
     private ArrayList<Freighter> tankerList;
 
-    // TODO 增加几种船舶的队列
-
     public FreighterTimetable() {
         this.freighterList = new ArrayList<>();
         this.containershipList = new ArrayList<>();
@@ -51,7 +49,8 @@ public class FreighterTimetable {
         this.freighterList = freighterList;
     }
 
-    /** TODO 排序
+
+    /**
      * 添加一个货轮到表中
      * @param freighter 要添加的货轮
      */
@@ -61,13 +60,20 @@ public class FreighterTimetable {
         }
 
         this.freighterList.add(freighter);
+        this.freighterList.sort(this::defaultSortingRules);
 
         if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
             this.containershipList.add(freighter);
+            this.containershipList.sort(this::defaultSortingRules);
+
         } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
             this.bulkCarrierList.add(freighter);
+            this.bulkCarrierList.sort(this::defaultSortingRules);
+
         } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
             this.tankerList.add(freighter);
+            this.tankerList.sort(this::defaultSortingRules);
+
         } else {
             throw new UnknownFormatConversionException("[ERROR] Unknown good type");
         }
@@ -76,21 +82,50 @@ public class FreighterTimetable {
 
     /**
      * 默认排序方式，按照【实际】的抵达时间
-     * @param l
-     * @param r
-     * @return
+     * @param l 左值
+     * @param r 右值
+     * @return int 类型的排序规则（升序）
      */
     private int defaultSortingRules(Freighter l, Freighter r) {
         return (int) (l.getActualArrivalTime() - r.getActualArrivalTime());
     }
 
+
     /**
      * 获取货轮的总量（包含所有类型）
      * @return 获取货轮的总量（包含所有类型）
      */
-    public int freighterNumber() {
+    public int allFreighterNumber() {
         return this.freighterList.size();
     }
+
+
+    /**
+     * 获取【集装箱】货轮的总量
+     * @return 货轮的总量（集装箱）
+     */
+    public int containershipNumber() {
+        return this.containershipList.size();
+    }
+
+
+    /**
+     * 获取【散货船】的总量
+     * @return 获取货轮的总量（散货船）
+     */
+    public int bulkCarrierNumber() {
+        return this.bulkCarrierList.size();
+    }
+
+
+    /**
+     * 获取【液货船】的总量
+     * @return 获取货轮的总量（液货船）
+     */
+    public int tankerNumber() {
+        return this.tankerList.size();
+    }
+
 
     /**
      * 平均等待时长
@@ -103,10 +138,10 @@ public class FreighterTimetable {
 
 
     /**
-     * 总罚款
+     * 所有类型货轮的总罚款
      * @return 总罚款
      */
-    public int totalFine() {
+    public int allFreighterTotalFine() {
         int totalFine = 0;
 
         for (Freighter freighter : this.freighterList) {
@@ -117,7 +152,56 @@ public class FreighterTimetable {
     }
 
 
+    /**
+     * 所有集装箱货船的总罚款
+     * @return 总罚款
+     */
+    public int containershipTotalFine() {
+        int totalFine = 0;
 
+        for (Freighter freighter : this.containershipList) {
+            totalFine += freighter.getFine();
+        }
+
+        return totalFine;
+    }
+
+
+    /**
+     * 所有散货船的总罚款
+     * @return 总罚款
+     */
+    public int bulkCarrierTotalFine() {
+        int totalFine = 0;
+
+        for (Freighter freighter : this.bulkCarrierList) {
+            totalFine += freighter.getFine();
+        }
+
+        return totalFine;
+    }
+
+
+    /**
+     * 所有液货船的总罚款
+     * @return 总罚款
+     */
+    public int tankerTotalFine() {
+        int totalFine = 0;
+
+        for (Freighter freighter : this.tankerList) {
+            totalFine += freighter.getFine();
+        }
+
+        return totalFine;
+    }
+
+
+    /**
+     * 按照索引从所有货轮列表中获取货轮
+     * @param index
+     * @return
+     */
     public Freighter get(int index) {
         if ((index >= this.freighterList.size()) || (index < 0)) {
             throw new IndexOutOfBoundsException("[ERROR] Index can not small than 0 or bigger than number of freighter");
@@ -166,18 +250,23 @@ public class FreighterTimetable {
                 freighter.setWeightOrNumber(InfoGenerator.randomTEUNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TEU));
+
             } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
                 this.bulkCarrierList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
+
             } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
                 this.tankerList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
+
+            } else {
+                throw new UnknownFormatConversionException("[ERROR] Unknown good type");
             }
 
             freighter.setActualStopTime(InfoGenerator.randomActualStopTime(freighter.getEstimatedStopTime()));
@@ -203,22 +292,47 @@ public class FreighterTimetable {
         return this.freighterList;
     }
 
+
+    /**
+     * 以列表的形式打印【所有】货轮的时间表
+     * @param timeType 显示时间的格式
+     */
     public void printAllFreighterTimetable(String timeType) {
         FreighterTimetable.printFreighterTimetable(this.freighterList, timeType);
     }
 
+
+    /**
+     * 以列表的形式打印【集装箱】货轮的时间表
+     * @param timeType 显示时间的格式
+     */
     public void printContainershipTimetable(String timeType) {
         FreighterTimetable.printFreighterTimetable(this.containershipList, timeType);
     }
 
+
+    /**
+     * 以列表的形式打印【散货船】的时间表
+     * @param timeType 显示时间的格式
+     */
     public void printBulkCarrierTimetable(String timeType) {
         FreighterTimetable.printFreighterTimetable(this.bulkCarrierList, timeType);
     }
 
+
+    /**
+     * 以列表的形式打印【液货船】的时间表
+     * @param timeType 显示时间的格式
+     */
     public void printTankerTimetable(String timeType) {
         FreighterTimetable.printFreighterTimetable(this.tankerList, timeType);
     }
 
+    /**
+     * 以列表的形式打印指定类型货轮的时间表
+     * @param freighterTimetable 存储货轮的 ArrayList
+     * @param timeType 显示时间的格式
+     */
     public static void printFreighterTimetable(ArrayList<Freighter> freighterTimetable, String timeType) {
         if ((freighterTimetable == null) || (freighterTimetable.size() == 0)) {
             System.out.println("[INFO] Freighter time table is empty");
