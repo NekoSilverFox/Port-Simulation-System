@@ -12,31 +12,31 @@ package com.foxthere.pojo.defines;
 
 public class StatisticalResults {
     /** 最佳起重机数量 */
-    int numCrane;
+    private int numCrane;
 
     /** 卸货船只的数量 */
-    int numFreighters;
+    private int numFreighters;
 
     /** 在队伍中平均等待时长（和最大时长 同下） (ms) */
-    long averageWaitingTimeInQueue;
+    private long averageWaitingTimeInQueue;
 
     /** 在队伍中最大的卸货等待时间 (ms) */
-    long maxUnloadingDelayTime;
+    private long maxUnloadingDelayTime;
 
     /** 平均的卸货延迟时间 (ms) */
-    long averageUnloadingDelayTime;
+    private long averageUnloadingDelayTime;
 
     /** 卸货的平均时长 (ms) */
-    long averageTimeOfUnloading;
+    private long averageTimeOfUnloading;
 
     /** 总罚款 */
-    int totalFine;
+    private long totalFine;
 
     public StatisticalResults() {
     }
 
     public StatisticalResults(int numCrane, int numFreighters, long averageWaitingTimeInQueue, long maxUnloadingDelayTime,
-                              long averageUnloadingDelayTime, long averageTimeOfUnloading, int totalFine) {
+                              long averageUnloadingDelayTime, long averageTimeOfUnloading, long totalFine) {
         this.numCrane = numCrane;
         this.numFreighters = numFreighters;
         this.averageWaitingTimeInQueue = averageWaitingTimeInQueue;
@@ -107,11 +107,11 @@ public class StatisticalResults {
         this.averageTimeOfUnloading = averageTimeOfUnloading;
     }
 
-    public int getTotalFine() {
+    public long getTotalFine() {
         return totalFine;
     }
 
-    public void setTotalFine(int totalFine) {
+    public void setTotalFine(long totalFine) {
         this.totalFine = totalFine;
     }
 }

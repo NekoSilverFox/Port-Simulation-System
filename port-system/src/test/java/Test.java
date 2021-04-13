@@ -37,14 +37,17 @@ public class Test {
         ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
 
         // 生成并写入
-/*        JsonManager.jsonWriter(
+        JsonManager.jsonWriter(
                 context.getBean("freighterTimetable", FreighterTimetable.class)
                         .createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION),
-                ConstantsTable.JSON_FILE_PATH);*/
+                ConstantsTable.JSON_FILE_PATH);
 
         FreighterTimetable freighterTimetable = context.getBean("freighterTimetable", FreighterTimetable.class);
 
         freighterTimetable.setFreighterList(JsonManager.jsonReader(ConstantsTable.JSON_FILE_PATH));
+
+/*        Freighter freighterByTerminal = StatisticalModels.createFreighterByTerminal();
+        freighterTimetable.addFreighter(freighterByTerminal);*/
 
         freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
 
@@ -89,6 +92,10 @@ public class Test {
 
         StatisticalModels.printStatistics(totalResults, "Results-AllFreighters");
         System.out.println("\n");
+
+/*        FreighterTimetable.printFreighterTimetable(containerships, ConstantsTable.TIME_TYPE);
+        FreighterTimetable.printFreighterTimetable(bulkCarriers, ConstantsTable.TIME_TYPE);
+        FreighterTimetable.printFreighterTimetable(tankers, ConstantsTable.TIME_TYPE);*/
 
         System.exit(0);
     }

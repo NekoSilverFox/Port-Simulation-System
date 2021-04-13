@@ -396,6 +396,8 @@ public class FreighterTimetable {
         System.out.println(String.format("%-13s", "Name")
                 + String.format("%-20s", "Type goods")
                 + String.format("%-20s", "Arrival time")
+                + String.format("%-20s", "Waiting time")
+                + String.format("%-25s", "Unload start time")
                 + String.format("%-25s", "Estimated stop time")
                 + String.format("%-20s", "Actual stop time")
                 + String.format("%-20s", "Fine"));
@@ -406,6 +408,8 @@ public class FreighterTimetable {
             System.out.println(String.format("%-13s", freighter.getName())
                     + String.format("%-20s", freighter.getTypeGoods().toString().toLowerCase(Locale.ROOT))
                     + String.format("%-20s", new SimpleDateFormat(timeType).format(new Date(freighter.getActualArrivalTime())))
+                    + String.format("%-20s", freighter.getWaitingTimeInQueue() / 1000 / 60 + " min")
+                    + String.format("%-25s", new SimpleDateFormat(timeType).format(freighter.getActualArrivalTime() + freighter.getWaitingTimeInQueue()))
                     + String.format("%-25s", freighter.getEstimatedStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", freighter.getActualStopTime() / 1000 / 60 + " min")
                     + String.format("%-20s", "$" + freighter.getFine())

@@ -57,13 +57,19 @@ public class StatisticalModels {
         System.out.println("Weight or number goods: ");
         int weightOrNumber = scanner.nextInt();
 
-        System.out.println("Estimated arrival time (ms): ");
+        System.out.println("Estimated arrival time (ms) [#Default now]: ");
         long estimatedArrivalTime = scanner.nextLong();
+        if (estimatedArrivalTime == 0) {
+            estimatedArrivalTime = System.currentTimeMillis();
+        }
 
-        System.out.println("Estimated stop time (ms): ");
+        System.out.println("Estimated stop time (ms) [#Default 4 h]: ");
         long estimatedStopTime = scanner.nextLong();
+        if (estimatedStopTime == 0) {
+            estimatedStopTime += 4 * 60 * 60 * 1000;
+        }
 
-        System.out.println("Is already unload: ");
+        System.out.println("Is already unload (true or false): ");
         boolean isUnload = scanner.nextBoolean();
 
         Freighter freighter = new Freighter(name, typeGoods, weightOrNumber,
@@ -84,15 +90,13 @@ public class StatisticalModels {
         // 上一个
         int lastTotalFines = 0;
 
-        // 在外部创建一个锁对象
-        Object lockObj = new Object();
-
         while (lastTotalFines < currentTotalFines) {
             lastTotalFines = currentTotalFines;
 
             currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
             ExecutorService executorService = Executors.newFixedThreadPool(numThread);
 
+            synchronized (StatisticalModels.class) {
             for (int i = 0; i < freighters.size(); i++) {
                 // 卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
                 long waitingTime = 0;
@@ -106,7 +110,7 @@ public class StatisticalModels {
                 int index = i;
 
                 long finalWaitingMS = waitingTime;
-                synchronized (lockObj) {
+// 原来同步块的位置在这下面
                     executorService.submit(() -> {
                         if ((finalWaitingMS > 0) && (freighters.size() > nextShipOnThisThread)) {
                             freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
@@ -123,8 +127,10 @@ public class StatisticalModels {
                             e.printStackTrace();
                         }
                     });
-                }
-            }
+                }  // end synchronized
+
+                freighters.get(1).setUnload(true);
+            }  // end for
 
             // 统计总罚款 + 起重机金额
             for (Freighter freighter : freighters) {
@@ -187,8 +193,7 @@ public class StatisticalModels {
         if (results == null) {
             throw new NullPointerException("[ERROR] Object StatisticalResults can not be null");
         }
-        System.out.println(tableHeader + " " + ConstantsTable.TABLE_LINE
-                + "---------------------------------------------------------------------------------");
+        System.out.println(tableHeader + " " + ConstantsTable.TABLE_LINE);
 
         System.out.println(String.format("%-20s", "Min cranes")
                         + String.format("%-25s", "Number freighters")
@@ -199,7 +204,7 @@ public class StatisticalModels {
                         + String.format("%-25s", "Total fine")
         );
 
-        System.out.println(ConstantsTable.TABLE_LINE + ConstantsTable.TABLE_LINE);
+        System.out.println(ConstantsTable.TABLE_LINE);
 
         System.out.println(String.format("%-20s", results.getNumCrane())
                         + String.format("%-25s", results.getNumFreighters())
@@ -210,7 +215,7 @@ public class StatisticalModels {
                         + String.format("%-25s", "$" + results.getTotalFine())
         );
 
-        System.out.println(ConstantsTable.TABLE_LINE + ConstantsTable.TABLE_LINE);
+        System.out.println(ConstantsTable.TABLE_LINE);
     }
 
     public static void main(String[] args) throws IOException {
