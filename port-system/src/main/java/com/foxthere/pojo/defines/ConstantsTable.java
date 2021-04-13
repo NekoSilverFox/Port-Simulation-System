@@ -65,7 +65,7 @@ public class ConstantsTable {
     /** 时间格式 */
     public static final String TIME_TYPE = "MM月dd日 HH:mm";
 
-    public static final int DEFAULT_SLEEP_MS = 10;
+    public static final int DEFAULT_SLEEP_MS = 0;
 
     /** 表头底线 */
     public static final String TABLE_LINE = "--------------------------------------------------------------------------------------------------------";

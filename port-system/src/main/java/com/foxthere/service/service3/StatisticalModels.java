@@ -63,9 +63,6 @@ public class StatisticalModels {
         System.out.println("Estimated stop time (ms): ");
         long estimatedStopTime = scanner.nextLong();
 
-        System.out.println("Actual stop time (ms): ");
-        long actualStopTime = scanner.nextLong();
-
         System.out.println("Is already unload: ");
         boolean isUnload = scanner.nextBoolean();
 
@@ -117,6 +114,7 @@ public class StatisticalModels {
                             // 原来就已经有的罚金（因为起重机的超时工作）
                             int fineAlreadyHave = freighters.get(index).getFine();
                             int finalWaitingHours = (int) (finalWaitingMS / 1000 / 60 / 60);
+                            freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
                             freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingHours * ConstantsTable.FINE_EVERY_HOUR + fineAlreadyHave));
                         }
                         try {
@@ -127,6 +125,12 @@ public class StatisticalModels {
                     });
                 }
             }
+
+            // 统计总罚款 + 起重机金额
+            for (Freighter freighter : freighters) {
+                currentTotalFines += freighter.getFine();
+            }
+
             // 测试当下一个数量线程时的情况
             numThread++;
         }
@@ -167,6 +171,7 @@ public class StatisticalModels {
 
             averageUnloadingDelayTime += (freighter.getActualStopTime() - freighter.getEstimatedStopTime());
             averageTimeOfUnloading += freighter.getActualStopTime();
+            totalFine += freighter.getFine();
 
         }
 
@@ -205,6 +210,7 @@ public class StatisticalModels {
                         + String.format("%-25s", "$" + results.getTotalFine())
         );
 
+        System.out.println(ConstantsTable.TABLE_LINE + ConstantsTable.TABLE_LINE);
     }
 
     public static void main(String[] args) throws IOException {
@@ -267,21 +273,25 @@ public class StatisticalModels {
                             int fineAlreadyHave = freighters.get(index).getFine();
                             freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingTime / 1000 / 60 / 60 * 100 + fineAlreadyHave));
                         }
-                        try {
+/*                        try {
                             Thread.sleep(10);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }
+                        }*/
 
                     });
                 }
             }
 
             // 统计总罚款
-            for (Freighter freighter : freighters) {
+/*            for (Freighter freighter : freighters) {
                 currentTotalFines += freighter.getFine();
-            }
-
+            }*/
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
             numThread++;
         }
 

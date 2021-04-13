@@ -11,6 +11,7 @@ import javax.imageio.plugins.tiff.FaxTIFFTagSet;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * -*- coding: utf-8 -*-
@@ -64,13 +65,16 @@ public class Test {
         StatisticalResults tankersResults = StatisticalModels.getStatistics(tankers);
         tankersResults.setNumCrane(minCraneTankers);
 
+        long tmpMax = Math.max(containershipsResults.getMaxUnloadingDelayTime(), bulkCarriersResults.getMaxUnloadingDelayTime());
+        long maxUnloadingDelayTime = Math.max(tmpMax, tankersResults.getMaxUnloadingDelayTime());
+
         StatisticalResults totalResults = new StatisticalResults(
                 minCraneContainerships + minCraneBulkCarriers + minCraneTankers,
                 containershipsResults.getNumFreighters() + bulkCarriersResults.getNumFreighters() + tankersResults.getNumFreighters(),
-                containershipsResults.getAverageWaitingTimeInQueue() + bulkCarriersResults.getAverageWaitingTimeInQueue() + tankersResults.getAverageWaitingTimeInQueue(),
-                containershipsResults.getMaxUnloadingDelayTime() + bulkCarriersResults.getMaxUnloadingDelayTime() + tankersResults.getMaxUnloadingDelayTime(),
-                containershipsResults.getAverageUnloadingDelayTime() + bulkCarriersResults.getAverageUnloadingDelayTime() + tankersResults.getAverageUnloadingDelayTime(),
-                containershipsResults.getAverageTimeOfUnloading() + bulkCarriersResults.getAverageTimeOfUnloading() + tankersResults.getAverageTimeOfUnloading(),
+                (containershipsResults.getAverageWaitingTimeInQueue() + bulkCarriersResults.getAverageWaitingTimeInQueue() + tankersResults.getAverageWaitingTimeInQueue()) / 3,
+                maxUnloadingDelayTime,
+                (containershipsResults.getAverageUnloadingDelayTime() + bulkCarriersResults.getAverageUnloadingDelayTime() + tankersResults.getAverageUnloadingDelayTime()) / 3,
+                (containershipsResults.getAverageTimeOfUnloading() + bulkCarriersResults.getAverageTimeOfUnloading() + tankersResults.getAverageTimeOfUnloading()) / 3,
                 containershipsResults.getTotalFine() + bulkCarriersResults.getTotalFine() + tankersResults.getTotalFine()
         );
 
@@ -86,6 +90,7 @@ public class Test {
         StatisticalModels.printStatistics(totalResults, "Results-AllFreighters");
         System.out.println("\n");
 
+        System.exit(0);
     }
 
     public static void write() throws IOException {
