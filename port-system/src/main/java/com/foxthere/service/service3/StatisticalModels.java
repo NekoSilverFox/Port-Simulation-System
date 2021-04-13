@@ -95,8 +95,10 @@ public class StatisticalModels {
 
             currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
             ExecutorService executorService = Executors.newFixedThreadPool(numThread);
+            Object lockObj = new Object();
 
-            synchronized (StatisticalModels.class) {
+//            synchronized (StatisticalModels.class) {
+            synchronized (lockObj) {
             for (int i = 0; i < freighters.size(); i++) {
                 // 卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
                 long waitingTime = 0;
@@ -119,10 +121,11 @@ public class StatisticalModels {
                             int fineAlreadyHave = freighters.get(index).getFine();
                             int finalWaitingHours = (int) (finalWaitingMS / 1000 / 60 / 60);
                             freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
-                            freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingHours * ConstantsTable.FINE_EVERY_HOUR + fineAlreadyHave));
+                            freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingHours * ConstantsTable.FINE_EVERY_HOUR/* + fineAlreadyHave*/));
                         }
                         try {
-                            Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
+//                            Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
+                            lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -137,6 +140,7 @@ public class StatisticalModels {
                 currentTotalFines += freighter.getFine();
             }
 
+            executorService.shutdownNow();
             // 测试当下一个数量线程时的情况
             numThread++;
         }
@@ -166,7 +170,7 @@ public class StatisticalModels {
         long averageTimeOfUnloading = 0;
 
         // 总罚款
-        int totalFine = 0;
+        long totalFine = 0;
 
         for (Freighter freighter : freighters) {
             averageWaitingTimeInQueue += freighter.getWaitingTimeInQueue();

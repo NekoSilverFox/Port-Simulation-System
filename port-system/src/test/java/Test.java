@@ -81,6 +81,10 @@ public class Test {
                 containershipsResults.getTotalFine() + bulkCarriersResults.getTotalFine() + tankersResults.getTotalFine()
         );
 
+        FreighterTimetable.printFreighterTimetable(containerships, ConstantsTable.TIME_TYPE);
+        FreighterTimetable.printFreighterTimetable(bulkCarriers, ConstantsTable.TIME_TYPE);
+        FreighterTimetable.printFreighterTimetable(tankers, ConstantsTable.TIME_TYPE);
+
         StatisticalModels.printStatistics(containershipsResults, "Results-Containerships");
         System.out.println("\n");
 
@@ -92,12 +96,7 @@ public class Test {
 
         StatisticalModels.printStatistics(totalResults, "Results-AllFreighters");
         System.out.println("\n");
-
-/*        FreighterTimetable.printFreighterTimetable(containerships, ConstantsTable.TIME_TYPE);
-        FreighterTimetable.printFreighterTimetable(bulkCarriers, ConstantsTable.TIME_TYPE);
-        FreighterTimetable.printFreighterTimetable(tankers, ConstantsTable.TIME_TYPE);*/
-
-        System.exit(0);
+//        System.exit(0);
     }
 
     public static void write() throws IOException {

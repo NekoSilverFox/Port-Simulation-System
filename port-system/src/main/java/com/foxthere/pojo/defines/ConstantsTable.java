@@ -63,9 +63,10 @@ public class ConstantsTable {
     public static final String JSON_FILE_PATH = "port-system\\src\\main\\java\\com\\foxthere\\data\\TimeTable.json";
 
     /** 时间格式 */
-    public static final String TIME_TYPE = "MM月dd日 HH:mm";
+    public static final String TIME_TYPE = "MM:dd:HH:mm";
 
-    public static final int DEFAULT_SLEEP_MS = 0;
+    /** 线程等待时间 */
+    public static final int DEFAULT_SLEEP_MS = 1000;
 
     /** 表头底线 */
     public static final String TABLE_LINE = "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
