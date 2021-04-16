@@ -28,23 +28,23 @@ public class InfoGenerator {
     }
 
 
-    /**
+    /** 理论的货船卸货的时间（没有加上在队伍中等待的时间）
      * @param weightOrNumber  货物的重量
      * @param craneEfficiency 起重机的效率（处理每单位物品的时间（ms））
      * @return 处理货物需要的【理论】时间（ms）
      */
-    public static long estimatedStopTime(int weightOrNumber, long craneEfficiency) {
+    public static long estimatedUnloadingTime(int weightOrNumber, long craneEfficiency) {
         return (long) weightOrNumber * craneEfficiency;  // TODO 增加起重机数量（Max 2）
     }
 
 
     /**
-     * 生成实际的停靠时间（带有随机值的毫秒值）
+     * 生成实际的卸货时间（带有随机值的毫秒值）
      *
      * @param estimatedStopTime 处理货物需要的理论时间（ms）
      * @return 处理货物需要的【实际】时间（ms）
      */
-    public static long randomActualStopTime(long estimatedStopTime) {
+    public static long randomActualUnloadingTime(long estimatedStopTime) {
         long randomTimeDeviation =
                 Math.abs(
                         new Random().nextLong())

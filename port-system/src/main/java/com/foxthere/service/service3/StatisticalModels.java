@@ -14,16 +14,9 @@ import com.foxthere.pojo.defines.ConstantsTable;
 import com.foxthere.pojo.defines.Freighter;
 import com.foxthere.pojo.defines.StatisticalResults;
 import com.foxthere.pojo.defines.TypeGoods;
-import com.foxthere.service.service1.FreighterTimetable;
 import com.foxthere.service.service1.InfoGenerator;
-import com.foxthere.service.service2.JsonManager;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -74,7 +67,7 @@ public class StatisticalModels {
 
         Freighter freighter = new Freighter(name, typeGoods, weightOrNumber,
                 estimatedArrivalTime, InfoGenerator.randomActualArrivalTime(estimatedArrivalTime),
-                estimatedStopTime, InfoGenerator.randomActualStopTime(estimatedStopTime),
+                estimatedStopTime, InfoGenerator.randomActualUnloadingTime(estimatedStopTime),
                 0, isUnload, 0);
 
         return freighter;
@@ -84,27 +77,27 @@ public class StatisticalModels {
         // 线程的数量（某种起重机的数量）
         int numThread = ConstantsTable.CRANE_INITIAL_NUM;
 
-        // 当前的总罚金
-        int currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
+        // 当前的总罚金 + 起重机的钱
+        int currentTotalCost = ConstantsTable.CRANE_PRICE * numThread;
 
         // 上一个
         int lastTotalFines = 0;
 
-        while (lastTotalFines < currentTotalFines) {
-            lastTotalFines = currentTotalFines;
+        while (lastTotalFines < currentTotalCost) {
+            lastTotalFines = currentTotalCost;  // TODO 写反了？
 
-            currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
+            currentTotalCost = ConstantsTable.CRANE_PRICE * numThread;
             ExecutorService executorService = Executors.newFixedThreadPool(numThread);
             Object lockObj = new Object();
-
+            System.out.println(Thread.currentThread().getId());
 //            synchronized (StatisticalModels.class) {
             synchronized (lockObj) {
             for (int i = 0; i < freighters.size(); i++) {
-                // 卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
+                // 本艘船的等待时间 ==  (上艘船的实际卸货时间 - 理论卸货时间) + 原本等待时间 |||||||||||||||卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
                 long waitingTime = 0;
-                if ((i + numThread) < freighters.size()) {
-                    waitingTime = (freighters.get(i).getActualStopTime() + freighters.get(i).getEstimatedArrivalTime())
-                            - freighters.get(i + numThread).getActualArrivalTime()
+                if ((i + numThread) < freighters.size()) {  // TODO 【错误】改为线程的编号 Thread.currentThread().getId()
+                    waitingTime = (freighters.get(i).getActualStopTime() + freighters.get(i).getEstimatedArrivalTime())  // TODO 改函数名
+                            - freighters.get(i - numThread).getActualArrivalTime() // 原来是 +
                             + freighters.get(i).getWaitingTimeInQueue();
                 }
 
@@ -114,6 +107,7 @@ public class StatisticalModels {
                 long finalWaitingMS = waitingTime;
 // 原来同步块的位置在这下面
                     executorService.submit(() -> {
+                        // 算罚金
                         if ((finalWaitingMS > 0) && (freighters.size() > nextShipOnThisThread)) {
                             freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
 
@@ -123,6 +117,7 @@ public class StatisticalModels {
                             freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
                             freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingHours * ConstantsTable.FINE_EVERY_HOUR/* + fineAlreadyHave*/));
                         }
+                        // wait 代码块未执行
                         try {
 //                            Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
                             lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
@@ -130,17 +125,18 @@ public class StatisticalModels {
                             e.printStackTrace();
                         }
                     });
-                }  // end synchronized
+                freighters.get(i).setUnload(true);
+            }  // end synchronized
 
-                freighters.get(1).setUnload(true);
             }  // end for
 
             // 统计总罚款 + 起重机金额
             for (Freighter freighter : freighters) {
-                currentTotalFines += freighter.getFine();
+                currentTotalCost += freighter.getFine();
             }
 
             executorService.shutdownNow();
+
             // 测试当下一个数量线程时的情况
             numThread++;
         }
@@ -222,91 +218,4 @@ public class StatisticalModels {
         System.out.println(ConstantsTable.TABLE_LINE);
     }
 
-    public static void main(String[] args) throws IOException {
-
-        ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
-
-        // 生成并写入
-/*        JsonManager.jsonWriter(
-                context.getBean("freighterTimetable", FreighterTimetable.class)
-                        .createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION),
-                ConstantsTable.JSON_FILE_PATH);*/
-
-        FreighterTimetable freighterTimetable = context.getBean("freighterTimetable", FreighterTimetable.class);
-
-        freighterTimetable.setFreighterList(JsonManager.jsonReader(ConstantsTable.JSON_FILE_PATH));
-
-        //freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
-
-
-        // 线程的数量（某种起重机的数量）
-        int numThread = 1;
-
-        // 传入一个测试的模型
-        ArrayList<Freighter> freighters = freighterTimetable.getContainershipList();
-        FreighterTimetable.printFreighterTimetable(freighters, ConstantsTable.TIME_TYPE);
-
-        // 当前的总罚金
-        int currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
-
-        // 上一个
-        int lastTotalFines = 0;
-
-        // 在外部创建一个锁对象
-        Object lockObj = new Object();
-
-        while (lastTotalFines < currentTotalFines) {
-            lastTotalFines = currentTotalFines;
-
-            currentTotalFines = ConstantsTable.CRANE_PRICE * numThread;
-            ExecutorService executorService = Executors.newFixedThreadPool(numThread);
-
-            for (int i = 0; i < freighters.size(); i++) {
-                // 卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
-                long waitingTime = 0;
-                if ((i + numThread) < freighters.size()) {
-                    waitingTime = (freighters.get(i).getActualStopTime() + freighters.get(i).getEstimatedArrivalTime())
-                            - freighters.get(i + numThread).getActualArrivalTime()
-                            + freighters.get(i).getWaitingTimeInQueue();
-                }
-
-                int nextShipOnThisThread = i + numThread;
-                int index = i;
-
-                long finalWaitingTime = waitingTime;
-                synchronized (lockObj) {
-                    executorService.submit(() -> {
-                        if (finalWaitingTime > 0 && (freighters.size() > nextShipOnThisThread)) {
-                            freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingTime);
-                            // 原来就已经有的罚金（因为起重机的超时工作）
-                            int fineAlreadyHave = freighters.get(index).getFine();
-                            freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingTime / 1000 / 60 / 60 * 100 + fineAlreadyHave));
-                        }
-/*                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }*/
-
-                    });
-                }
-            }
-
-            // 统计总罚款
-/*            for (Freighter freighter : freighters) {
-                currentTotalFines += freighter.getFine();
-            }*/
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-            numThread++;
-        }
-
-        System.out.println("集装箱类的船舶数量：" + freighters.size());
-        System.out.println("最优起重机数量：" + (numThread - 1));
-        System.out.println("总罚金 + 起重机数量：" + lastTotalFines);
-        System.exit(0);
-    }
 }

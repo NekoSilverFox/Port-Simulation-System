@@ -23,21 +23,25 @@ import java.util.UnknownFormatConversionException;
 public class FreighterTimetable {
     /**
      * 储存货轮的 ArrayList，存储有所有类型的货轮
+     * ArrayList хранение всех типов грузовых судов
      */
     private ArrayList<Freighter> freighterList;
 
     /**
      * 集装箱货船
+     * контейнерное судно
      */
     private ArrayList<Freighter> containershipList;
 
     /**
      * 散货船
+     * насыпной транспортёр
      */
     private ArrayList<Freighter> bulkCarrierList;
 
     /**
      * 液货船
+     * наливное судно
      */
     private ArrayList<Freighter> tankerList;
 
@@ -57,6 +61,11 @@ public class FreighterTimetable {
         return freighterList;
     }
 
+    /**
+     * 设置存储货轮的表格，并且按照时间排序
+     * Установить таблицу для хранения грузовых кораблей и сортировать их по времени
+     * @param freighterList 货轮的表格
+     */
     public void setFreighterList(ArrayList<Freighter> freighterList) {
         this.freighterList = freighterList;
         this.containershipList = new ArrayList<>();
@@ -64,14 +73,22 @@ public class FreighterTimetable {
         this.tankerList = new ArrayList<>();
 
         for (Freighter freighter : freighterList) {
-            if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
-                containershipList.add(freighter);
-            } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
-                bulkCarrierList.add(freighter);
-            } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
-                tankerList.add(freighter);
-            } else {
-                throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+            switch (freighter.getTypeGoods()) {
+                case CONTAINER -> {
+                    containershipList.add(freighter);
+                    break;
+                }
+                case BULK_CARGO -> {
+                    bulkCarrierList.add(freighter);
+                    break;
+                }
+                case LIQUID -> {
+                    tankerList.add(freighter);
+                    break;
+                }
+                default -> {
+                    throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+                }
             }
         }
 
@@ -95,27 +112,33 @@ public class FreighterTimetable {
         this.freighterList.add(freighter);
         this.freighterList.sort(this::defaultSortingRules);
 
-        if (freighter.getTypeGoods() == TypeGoods.CONTAINER) {
-            this.containershipList.add(freighter);
-            this.containershipList.sort(this::defaultSortingRules);
-
-        } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
-            this.bulkCarrierList.add(freighter);
-            this.bulkCarrierList.sort(this::defaultSortingRules);
-
-        } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
-            this.tankerList.add(freighter);
-            this.tankerList.sort(this::defaultSortingRules);
-
-        } else {
-            throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+        switch (freighter.getTypeGoods()) {
+            case CONTAINER -> {
+                this.containershipList.add(freighter);
+                this.containershipList.sort(this::defaultSortingRules);
+                return;
+            }
+            case BULK_CARGO -> {
+                this.bulkCarrierList.add(freighter);
+                this.bulkCarrierList.sort(this::defaultSortingRules);
+                return;
+            }
+            case LIQUID -> {
+                this.tankerList.add(freighter);
+                this.tankerList.sort(this::defaultSortingRules);
+                return;
+            }
+            default -> {
+                throw new UnknownFormatConversionException("[ERROR] Unknown good type");
+            }
         }
+
     }
 
 
     /**
      * 默认排序方式，按照【实际】的抵达时间
-     *
+     * Метод сортировки по умолчанию, по [фактическому] времени прибытия.
      * @param l 左值
      * @param r 右值
      * @return int 类型的排序规则（升序）
@@ -127,7 +150,7 @@ public class FreighterTimetable {
 
     /**
      * 获取货轮的总量（包含所有类型）
-     *
+     * Получить общее количество грузовых судов (со всеми типами).
      * @return 获取货轮的总量（包含所有类型）
      */
     public int allFreighterNumber() {
@@ -137,7 +160,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【集装箱】货轮的总量
-     *
+     * Получить общее количество грузовых судов [контейнеровозов].
      * @return 货轮的总量（集装箱）
      */
     public int containershipNumber() {
@@ -147,7 +170,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【散货船】的总量
-     *
+     * Получить общее количество [насыпных грузов].
      * @return 获取货轮的总量（散货船）
      */
     public int bulkCarrierNumber() {
@@ -293,28 +316,28 @@ public class FreighterTimetable {
                 this.containershipList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTEUNumber());
-                freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
+                freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TEU));
 
             } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
                 this.bulkCarrierList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
-                freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
+                freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
 
             } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
                 this.tankerList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
-                freighter.setEstimatedStopTime(InfoGenerator.estimatedStopTime(freighter.getWeightOrNumber(),
+                freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
                         ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
 
             } else {
                 throw new UnknownFormatConversionException("[ERROR] Unknown good type");
             }
 
-            freighter.setActualStopTime(InfoGenerator.randomActualStopTime(freighter.getEstimatedStopTime()));
+            freighter.setActualStopTime(InfoGenerator.randomActualUnloadingTime(freighter.getEstimatedStopTime()));
 
             // 与预计完成卸货时间的差距（单位：ms）
             long unloadDelayTime = freighter.getActualStopTime() - freighter.getEstimatedStopTime();

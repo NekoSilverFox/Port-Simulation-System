@@ -5,12 +5,21 @@ package com.foxthere.pojo.defines;
  */
 
 public enum TypeGoods {
-    // контейнер 集装箱
+    /**
+     * 集装箱
+     * контейнер
+     */
     CONTAINER,
 
-    // жидкий 液体
+    /**
+     * 液体
+     * жидкий
+     */
     LIQUID,
 
-    // сыпучий 散货
+    /**
+     * 散货
+     * сыпучий
+     */
     BULK_CARGO
 }

@@ -18,26 +18,31 @@ import java.util.Objects;
 public class Freighter {
     /**
      * 货船的名字
+     * Наименование грузового судна
      */
     private String name;
 
     /**
      * 货船搭载的货物类型
+     * Вид груза, перевозимого грузовыми судами
      */
     private TypeGoods typeGoods;
 
     /**
      * 载货重量，对于 集装箱（单位：件数），对于液体和散货（单位：吨）
+     * Грузоподъемность, для контейнеров (в штуках), для наливных и насыпных грузов (в тоннах)
      */
     private int weightOrNumber;
 
     /**
      * 预计抵达时间（毫秒值）
+     * Расчетное время прибытия (значения в миллисекундах)
      */
     private long estimatedArrivalTime;
 
     /**
      * 实际抵达时间（毫秒值）
+     * Фактическое время прибытия (значение в миллисекундах)
      */
     private long actualArrivalTime;
 
@@ -48,21 +53,25 @@ public class Freighter {
 
     /**
      * 实际停靠时间（卸货的时间） 单位：ms
+     * Расчетное время стыковки (время до разгрузки) Единица измерения: мс
      */
     private long actualStopTime;
 
     /**
      * 在队列中等待的时长
+     * Длительность ожидания в очереди
      */
     private long waitingTimeInQueue;
 
     /**
      * 是否完成了卸货，true代表完成了卸货，false代表没有
+     * Завершена ли разгрузка, истинно ли разгрузка завершена, ложно ли - нет.
      */
     private boolean isUnload;
 
     /**
      * 罚款 单位：美元
+     * Штрафы в долларах США
      */
     private int fine;
 
@@ -88,7 +97,8 @@ public class Freighter {
 
     /**
      * 判断信息是否缺失，如果某个成员变量没有赋值或者异常，则返回 true；否则返回 false
-     *
+     * Определяет, отсутствует ли информация, и возвращает true,
+     * если переменной-члену не присвоено значение или исключение; в противном случае возвращает false
      * @return 是否缺失
      */
     public boolean isIncompleteInfo() {

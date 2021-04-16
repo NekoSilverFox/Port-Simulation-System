@@ -11,25 +11,46 @@
 package com.foxthere.pojo.defines;
 
 public class StatisticalResults {
-    /** 最佳起重机数量 */
+    /**
+     * 最佳起重机数量
+     * Оптимальное количество кранов
+     */
     private int numCrane;
 
-    /** 卸货船只的数量 */
+    /**
+     * 卸货船只的数量
+     * Количество судов, разгружающих груз
+     */
     private int numFreighters;
 
-    /** 在队伍中平均等待时长（和最大时长 同下） (ms) */
+    /**
+     * 在队伍中平均等待时长（和最大时长 同下） (ms)
+     * Среднее время ожидания в очереди (и максимальное время ниже) (мс)
+     */
     private long averageWaitingTimeInQueue;
 
-    /** 在队伍中最大的卸货等待时间 (ms) */
+    /**
+     * 在队伍中最大的卸货等待时间 (ms)
+     * Максимальное время ожидания разгрузки в очереди (мс)
+     */
     private long maxUnloadingDelayTime;
 
-    /** 平均的卸货延迟时间 (ms) */
+    /**
+     * 平均的卸货延迟时间 (ms)
+     * Среднее время задержки разгрузки (мс)
+     */
     private long averageUnloadingDelayTime;
 
-    /** 卸货的平均时长 (ms) */
+    /**
+     * 卸货的平均时长 (ms)
+     * Среднее время на разгрузку (мс)
+     */
     private long averageTimeOfUnloading;
 
-    /** 总罚款 */
+    /**
+     * 总罚款
+     * Общие штрафы
+     */
     private long totalFine;
 
     public StatisticalResults() {
