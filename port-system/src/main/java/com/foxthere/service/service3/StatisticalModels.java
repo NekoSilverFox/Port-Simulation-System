@@ -78,6 +78,9 @@ public class StatisticalModels {
         // 线程的数量（某种起重机的数量）
         int numThreadOrCrane = ConstantsTable.CRANE_INITIAL_NUM;
 
+        // 创建一个线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreadOrCrane);
+
         // 当前情况的总金额（总罚金 + 起重机的钱）
         long currentTotalCost = ConstantsTable.CRANE_PRICE * numThreadOrCrane;
 
@@ -85,32 +88,104 @@ public class StatisticalModels {
         long lastTotalCost = 0;
 
         // 当前队列
-        ArrayList<Freighter> currentFreightersForCalculate = null;
+        ArrayList<Freighter> currentFreighters = null;
 
         // 上次的队列
-        ArrayList<Freighter> lastFreightersForCalculate = null;
+        ArrayList<Freighter> lastFreighters = null;
 
-                // 锁对象
+        // 锁对象
         Object lockObj = new Object();
 
         // 使用 while 循环迭代尝试
         while (true) {
 
             // 首先将船舶的队伍进行备份，避免在处理计算时影响原队列出错
-            currentFreightersForCalculate = freighters;
+            currentFreighters = freighters;
 
-            /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  计算船舶的等待时间 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-             * 本艘船的等待时间 = (上艘船的实际卸货时间 - 理论卸货时间) + 原本等待时间
-             */
-            for (int i = 0; i < currentFreightersForCalculate.size(); i++) {
+            synchronized (lockObj) {
 
-            }
+                /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  numThreadOrCrane的情况处理开始，计算必要的信息 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                for (int i = 0; i < currentFreighters.size(); i++) {
+
+                    executorService.submit(() -> {
+
+
+
+                    int currentThreadID = (int) Thread.currentThread().getId();
+
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  计算是否使用两台起重机 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                     * 如果数组不越界，并且 【当前船使用两台起重机的处理完成时刻(点) < 下一艘船的到达时刻(点)】，那么给他分配两台起重机（也就是需要把原本的卸货时间除以2）
+                     * 其中 【当前船使用两台起重机的处理完成时刻(点) == 当前船的实际到达时间(片) + 因为前面船的延误时间(片) + 使用两台起重机的处理完成时间(片)】
+                     * unloadingTimeIfUse2Crane -> 如果使用两台起重机的话，卸货结束时刻(点)
+                     */
+                    long unloadingTimeIfUse2Crane = currentFreighters.get(i).getActualArrivalTime()
+                            + currentFreighters.get(i).getActualStopTime()
+                            + (currentFreighters.get(i).getEstimatedStopTime() / 2);
+                    if (
+                            ((i + currentThreadID) < currentFreighters.size())
+                                    && (unloadingTimeIfUse2Crane > currentFreighters.get(i + currentThreadID).getActualArrivalTime())
+                    ) {
+                        currentFreighters.get(i).setActualStopTime(
+                                currentFreighters.get(i).getActualStopTime() / 2
+                        );
+                    }
+
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的等待时间 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                     * 本艘船的等待时间 = (上艘船的实际卸货时间 - 理论卸货时间) + 原本在队列中的等待时间
+                     */
+                    // 本艘船的等待时间
+                    long currentFreighterWaitingTime = 0;
+                    if ((i + currentThreadID) < currentFreighters.size()) {
+                        currentFreighterWaitingTime =
+                                (currentFreighters.get(i).getEstimatedStopTime() - currentFreighters.get(i).getActualStopTime())
+                                        + currentFreighters.get(i + currentThreadID).getWaitingTimeInQueue();
+
+                        // 设置本线程要处理的下一艘的等待时间（由上面计算得到）
+                        currentFreighters.get(i + currentThreadID).setWaitingTimeInQueue(currentFreighterWaitingTime);
+                    }
+
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的罚金 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                     * 我觉得这块不太对！！
+                     */
+                    if (
+                            (currentFreighterWaitingTime > 0)
+                                    && ((i + currentThreadID) > currentFreighters.size())
+                    ) {
+                        // 本线程下艘要处理的船原来就已经有的罚金（因为起重机的超时工作）
+                        int fineAlreadyHaveNextFreighters = freighters.get(i).getFine();
+
+                        // 为了便于计算，把等待的时间（毫秒值）转化为小时
+                        int finalWaitingHoursNextFreighters = (int) (currentFreighterWaitingTime / 1000 / 60 / 60);
+
+                        // 【最终罚金】 == 原罚金 + 加上因为在队列中等待而产生的新罚金
+                        int totalFineNextFreighters = fineAlreadyHaveNextFreighters
+                                + finalWaitingHoursNextFreighters * ConstantsTable.FINE_EVERY_HOUR;
+
+                        currentFreighters.get(i + currentThreadID).setFine(totalFineNextFreighters);
+                    }
+
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                    try {
+                        Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
+//                    lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 把当前船的状态设置为 “已卸货” ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                    currentFreighters.get(i).setUnload(true);
+
+                    });  // 进程快结束
+
+                } // for 循环结束
+
+            } // 同步块结束
 
 
 
             /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  判断是否需要进行下次迭代 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
             // 计算当起重机数量为 numThreadOrCrane 时（当前情况），总的消费为多少
-            for (Freighter freighter : currentFreightersForCalculate) {
+            for (Freighter freighter : currentFreighters) {
                 // 注意：当 for 循环执行完毕时，【currentTotalCost == 各个船只的罚金 + 起重机的数量 * 起重机的个数】
                 currentTotalCost += freighter.getFine();
             }
@@ -119,7 +194,7 @@ public class StatisticalModels {
             if (currentTotalCost > lastTotalCost) {
                 // 注意，要用这种方式替换（下面两行），否则会可能导致数组大小异常！
                 freighters.clear();
-                freighters.addAll(lastFreightersForCalculate);
+                freighters.addAll(lastFreighters);
 
                 // 将上一情况的起重机数量返回（最优情况）
                 return (numThreadOrCrane - 1);
@@ -128,7 +203,7 @@ public class StatisticalModels {
 
             /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  不是最优解，所以为下次迭代做准备（current 变 last） ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
             // 当起重机数量为 numThreadOrCrane 的情况计算完毕，将计算完的队列进行备份
-            lastFreightersForCalculate = currentFreightersForCalculate;
+            lastFreighters = currentFreighters;
 
             // 当前迭代完毕，将当前状况的总金额赋值到上一个情况（也就是说开始新情况了，现在的current情况 变成了 last情况）
             lastTotalCost = currentTotalCost;
@@ -138,12 +213,17 @@ public class StatisticalModels {
 
             // 初始化金额（只有起重机的总花费）
             currentTotalCost = (long) ConstantsTable.CRANE_PRICE * numThreadOrCrane;
+
+            // 重置线程池
+            executorService.shutdownNow();
+            executorService = Executors.newFixedThreadPool(numThreadOrCrane);
         }
     }
 
 
     /**
      * 计算 服务三 中的统计结果（注意：该方法不会对起重机数量进行赋值）
+     *
      * @param freighters 需要计算的货船队列
      * @return 服务三中需求的结果
      */
@@ -194,7 +274,8 @@ public class StatisticalModels {
 
     /**
      * 按照格式打印结果表格
-     * @param results 要打印的结果
+     *
+     * @param results     要打印的结果
      * @param tableHeader 表头的字符串（说明信息）
      */
     public static void printStatistics(StatisticalResults results, String tableHeader) {
@@ -204,23 +285,23 @@ public class StatisticalModels {
         System.out.println(tableHeader + " " + ConstantsTable.TABLE_LINE);
 
         System.out.println(String.format("%-20s", "Min cranes")
-                        + String.format("%-25s", "Number freighters")
-                        + String.format("%-35s", "Average waiting time in queue")
-                        + String.format("%-35s", "Max unloading delay time")
-                        + String.format("%-35s", "Average unloading delay time")
-                        + String.format("%-35s", "Average time of unloading")
-                        + String.format("%-25s", "Total fine")
+                + String.format("%-25s", "Number freighters")
+                + String.format("%-35s", "Average waiting time in queue")
+                + String.format("%-35s", "Max unloading delay time")
+                + String.format("%-35s", "Average unloading delay time")
+                + String.format("%-35s", "Average time of unloading")
+                + String.format("%-25s", "Total fine")
         );
 
         System.out.println(ConstantsTable.TABLE_LINE);
 
         System.out.println(String.format("%-20s", results.getNumCrane())
-                        + String.format("%-25s", results.getNumFreighters())
-                        + String.format("%-35s", results.getAverageWaitingTimeInQueue() / 1000 / 60 / 60 + " min")
-                        + String.format("%-35s", results.getMaxUnloadingDelayTime() / 1000 / 60 / 60 + " min")
-                        + String.format("%-35s", results.getAverageUnloadingDelayTime() / 1000 / 60 / 60 + " min")
-                        + String.format("%-35s", results.getAverageTimeOfUnloading() / 1000 / 60 / 60 + " min")
-                        + String.format("%-25s", "$" + results.getTotalFine())
+                + String.format("%-25s", results.getNumFreighters())
+                + String.format("%-35s", results.getAverageWaitingTimeInQueue() / 1000 / 60 / 60 + " min")
+                + String.format("%-35s", results.getMaxUnloadingDelayTime() / 1000 / 60 / 60 + " min")
+                + String.format("%-35s", results.getAverageUnloadingDelayTime() / 1000 / 60 / 60 + " min")
+                + String.format("%-35s", results.getAverageTimeOfUnloading() / 1000 / 60 / 60 + " min")
+                + String.format("%-25s", "$" + results.getTotalFine())
         );
 
         System.out.println(ConstantsTable.TABLE_LINE);
