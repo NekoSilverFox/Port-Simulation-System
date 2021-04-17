@@ -17,6 +17,12 @@ public class ConstantsTable {
     /** 每种起重机初始数量，单位（个） */
     public static final int CRANE_INITIAL_NUM = 1;
 
+    /** 默认为船舶服务的起重机数量，单位（个） */
+    public static final int DEFAULT_CRANE_NUM_FOR_ONE_FREIGHTER = 2;
+
+    /** 最多为船舶服务的起重机数量，单位（个） */
+    public static final int MAX_CRANE_NUM_FOR_ONE_FREIGHTER = 2;
+
     /** 起重机的效率，每处理一件所需的平均时间 30箱/小时 ==> 每箱2分钟（单位：ms）*/
     public static final int CRANE_REQUIRED_PROCESS_ONE_TEU = 2 * 60 * 1000;
 

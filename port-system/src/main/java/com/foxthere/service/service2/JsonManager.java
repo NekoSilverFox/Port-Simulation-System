@@ -21,6 +21,12 @@ import java.util.stream.Stream;
 
 
 public class JsonManager {
+    /**
+     * 将存储船舶的 ArrayList 写入到 json 文件中
+     * @param freighterArrayList 将存储船舶的 ArrayList
+     * @param filePath 写入的路径
+     * @throws IOException 文件无法创建或路径错误
+     */
     public static void jsonWriter(ArrayList<Freighter> freighterArrayList, String filePath) throws IOException {
         File file = new File(filePath);
 
@@ -48,7 +54,12 @@ public class JsonManager {
         mapper.writeValue(new FileWriter(filePath), freighterArrayList);
     }
 
-
+    /**
+     * 从 json 文件中，读取存储船舶的 ArrayList
+     * @param filePath 读取的路径
+     * @return 读取到的 ArrayList
+     * @throws IOException 文件打开
+     */
     public static ArrayList<Freighter> jsonReader(String filePath) throws IOException {
         FileReader fileReader = new FileReader(filePath);
         int len = 0;

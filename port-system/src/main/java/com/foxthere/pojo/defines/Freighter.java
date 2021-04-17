@@ -35,30 +35,30 @@ public class Freighter {
     private int weightOrNumber;
 
     /**
-     * 预计抵达时间（毫秒值）
+     * 【时间点】预计抵达时间（毫秒值）
      * Расчетное время прибытия (значения в миллисекундах)
      */
     private long estimatedArrivalTime;
 
     /**
-     * 实际抵达时间（毫秒值）
+     * 【时间点】实际抵达时间（毫秒值）
      * Фактическое время прибытия (значение в миллисекундах)
      */
     private long actualArrivalTime;
 
     /**
-     * 预计停靠时间（卸货的时间） 单位：ms
+     * 【时间片】预计停靠时间（卸货的时间） 单位：ms
      */
     private long estimatedStopTime;
 
     /**
-     * 实际停靠时间（卸货的时间） 单位：ms
+     * 【时间片】实际停靠时间（卸货的时间） 单位：ms
      * Расчетное время стыковки (время до разгрузки) Единица измерения: мс
      */
     private long actualStopTime;
 
     /**
-     * 在队列中等待的时长
+     * 【时间片】在队列中等待的时长
      * Длительность ожидания в очереди
      */
     private long waitingTimeInQueue;

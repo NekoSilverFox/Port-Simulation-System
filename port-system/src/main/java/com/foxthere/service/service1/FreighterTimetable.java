@@ -317,21 +317,24 @@ public class FreighterTimetable {
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTEUNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
-                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TEU));
+                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TEU,
+                        ConstantsTable.DEFAULT_CRANE_NUM_FOR_ONE_FREIGHTER));
 
             } else if (freighter.getTypeGoods() == TypeGoods.BULK_CARGO) {
                 this.bulkCarrierList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
-                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
+                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON,
+                        ConstantsTable.DEFAULT_CRANE_NUM_FOR_ONE_FREIGHTER));
 
             } else if (freighter.getTypeGoods() == TypeGoods.LIQUID) {
                 this.tankerList.add(freighter);
 
                 freighter.setWeightOrNumber(InfoGenerator.randomTONNumber());
                 freighter.setEstimatedStopTime(InfoGenerator.estimatedUnloadingTime(freighter.getWeightOrNumber(),
-                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON));
+                        ConstantsTable.CRANE_REQUIRED_PROCESS_ONE_TON,
+                        ConstantsTable.DEFAULT_CRANE_NUM_FOR_ONE_FREIGHTER));
 
             } else {
                 throw new UnknownFormatConversionException("[ERROR] Unknown good type");

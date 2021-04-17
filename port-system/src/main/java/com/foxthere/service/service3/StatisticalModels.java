@@ -74,77 +74,79 @@ public class StatisticalModels {
     }
 
     public static int getMinCraneNumber(ArrayList<Freighter> freighters) {
+        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  变量区 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
         // 线程的数量（某种起重机的数量）
-        int numThread = ConstantsTable.CRANE_INITIAL_NUM;
+        int numThreadOrCrane = ConstantsTable.CRANE_INITIAL_NUM;
 
-        // 当前的总罚金 + 起重机的钱
-        int currentTotalCost = ConstantsTable.CRANE_PRICE * numThread;
+        // 当前情况的总金额（总罚金 + 起重机的钱）
+        long currentTotalCost = ConstantsTable.CRANE_PRICE * numThreadOrCrane;
 
-        // 上一个
-        int lastTotalFines = 0;
+        // 上一个情况的总金额（总罚金 + 起重机的钱）
+        long lastTotalCost = 0;
 
-        while (lastTotalFines < currentTotalCost) {
-            lastTotalFines = currentTotalCost;  // TODO 写反了？
+        // 当前队列
+        ArrayList<Freighter> currentFreightersForCalculate = null;
 
-            currentTotalCost = ConstantsTable.CRANE_PRICE * numThread;
-            ExecutorService executorService = Executors.newFixedThreadPool(numThread);
-            Object lockObj = new Object();
-            System.out.println(Thread.currentThread().getId());
-//            synchronized (StatisticalModels.class) {
-            synchronized (lockObj) {
-            for (int i = 0; i < freighters.size(); i++) {
-                // 本艘船的等待时间 ==  (上艘船的实际卸货时间 - 理论卸货时间) + 原本等待时间 |||||||||||||||卸货完成的时间 - 下一艘船的到达时间就是下一艘船的等待时间
-                long waitingTime = 0;
-                if ((i + numThread) < freighters.size()) {  // TODO 【错误】改为线程的编号 Thread.currentThread().getId()
-                    waitingTime = (freighters.get(i).getActualStopTime() + freighters.get(i).getEstimatedArrivalTime())  // TODO 改函数名
-                            - freighters.get(i - numThread).getActualArrivalTime() // 原来是 +
-                            + freighters.get(i).getWaitingTimeInQueue();
-                }
+        // 上次的队列
+        ArrayList<Freighter> lastFreightersForCalculate = null;
 
-                int nextShipOnThisThread = i + numThread;
-                int index = i;
+                // 锁对象
+        Object lockObj = new Object();
 
-                long finalWaitingMS = waitingTime;
-// 原来同步块的位置在这下面
-                    executorService.submit(() -> {
-                        // 算罚金
-                        if ((finalWaitingMS > 0) && (freighters.size() > nextShipOnThisThread)) {
-                            freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
+        // 使用 while 循环迭代尝试
+        while (true) {
 
-                            // 原来就已经有的罚金（因为起重机的超时工作）
-                            int fineAlreadyHave = freighters.get(index).getFine();
-                            int finalWaitingHours = (int) (finalWaitingMS / 1000 / 60 / 60);
-                            freighters.get(nextShipOnThisThread).setWaitingTimeInQueue(finalWaitingMS);
-                            freighters.get(nextShipOnThisThread).setFine((int) (finalWaitingHours * ConstantsTable.FINE_EVERY_HOUR/* + fineAlreadyHave*/));
-                        }
-                        // wait 代码块未执行
-                        try {
-//                            Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
-                            lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                freighters.get(i).setUnload(true);
-            }  // end synchronized
+            // 首先将船舶的队伍进行备份，避免在处理计算时影响原队列出错
+            currentFreightersForCalculate = freighters;
 
-            }  // end for
+            /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  计算船舶的等待时间 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+             * 本艘船的等待时间 = (上艘船的实际卸货时间 - 理论卸货时间) + 原本等待时间
+             */
+            for (int i = 0; i < currentFreightersForCalculate.size(); i++) {
 
-            // 统计总罚款 + 起重机金额
-            for (Freighter freighter : freighters) {
+            }
+
+
+
+            /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  判断是否需要进行下次迭代 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+            // 计算当起重机数量为 numThreadOrCrane 时（当前情况），总的消费为多少
+            for (Freighter freighter : currentFreightersForCalculate) {
+                // 注意：当 for 循环执行完毕时，【currentTotalCost == 各个船只的罚金 + 起重机的数量 * 起重机的个数】
                 currentTotalCost += freighter.getFine();
             }
 
-            executorService.shutdownNow();
+            // 当 【当前情况的总金额 > 上一个情况的总金额】 时，那么上一个情况便为最优解，也就是花费最小的情况，此时应当终止程序并将参数中的集合给覆盖
+            if (currentTotalCost > lastTotalCost) {
+                // 注意，要用这种方式替换（下面两行），否则会可能导致数组大小异常！
+                freighters.clear();
+                freighters.addAll(lastFreightersForCalculate);
 
-            // 测试当下一个数量线程时的情况
-            numThread++;
+                // 将上一情况的起重机数量返回（最优情况）
+                return (numThreadOrCrane - 1);
+            }
+
+
+            /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  不是最优解，所以为下次迭代做准备（current 变 last） ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+            // 当起重机数量为 numThreadOrCrane 的情况计算完毕，将计算完的队列进行备份
+            lastFreightersForCalculate = currentFreightersForCalculate;
+
+            // 当前迭代完毕，将当前状况的总金额赋值到上一个情况（也就是说开始新情况了，现在的current情况 变成了 last情况）
+            lastTotalCost = currentTotalCost;
+
+            // 当起重机数量为 numThreadOrCrane 的情况计算完毕，进行 +1 操作。准备进行下一种情况的计算
+            numThreadOrCrane++;
+
+            // 初始化金额（只有起重机的总花费）
+            currentTotalCost = (long) ConstantsTable.CRANE_PRICE * numThreadOrCrane;
         }
-
-        return (numThread - 1);
     }
 
 
+    /**
+     * 计算 服务三 中的统计结果（注意：该方法不会对起重机数量进行赋值）
+     * @param freighters 需要计算的货船队列
+     * @return 服务三中需求的结果
+     */
     public static StatisticalResults getStatistics(ArrayList<Freighter> freighters) {
         if ((freighters == null) || (freighters.isEmpty())) {
             return null;
@@ -189,6 +191,12 @@ public class StatisticalModels {
                 averageUnloadingDelayTime, averageTimeOfUnloading, totalFine);
     }
 
+
+    /**
+     * 按照格式打印结果表格
+     * @param results 要打印的结果
+     * @param tableHeader 表头的字符串（说明信息）
+     */
     public static void printStatistics(StatisticalResults results, String tableHeader) {
         if (results == null) {
             throw new NullPointerException("[ERROR] Object StatisticalResults can not be null");

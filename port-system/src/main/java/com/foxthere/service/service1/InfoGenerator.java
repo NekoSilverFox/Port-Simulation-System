@@ -16,6 +16,11 @@ import com.foxthere.pojo.defines.TypeGoods;
 import java.util.Random;
 
 public class InfoGenerator {
+    /**
+     * 【时间点】生成实际的到达时间
+     * @param estimatedArrivalTime 理论到达时间
+     * @return 理论到达时间 + 随机值
+     */
     public static long randomActualArrivalTime(long estimatedArrivalTime) {
         // 如果生成的是 true 则提前到达，如果是 false 则延迟到达
         if (new Random().nextBoolean()) {
@@ -28,18 +33,21 @@ public class InfoGenerator {
     }
 
 
-    /** 理论的货船卸货的时间（没有加上在队伍中等待的时间）
+    /** 【时间片】理论的货船卸货的时间（没有加上在队伍中等待的时间）
      * @param weightOrNumber  货物的重量
      * @param craneEfficiency 起重机的效率（处理每单位物品的时间（ms））
      * @return 处理货物需要的【理论】时间（ms）
      */
-    public static long estimatedUnloadingTime(int weightOrNumber, long craneEfficiency) {
-        return (long) weightOrNumber * craneEfficiency;  // TODO 增加起重机数量（Max 2）
+    public static long estimatedUnloadingTime(int weightOrNumber, long craneEfficiency, int craneNumber) {
+        if (craneNumber > ConstantsTable.MAX_CRANE_NUM_FOR_ONE_FREIGHTER) {
+            throw new IndexOutOfBoundsException("[ERROR] Crane number can not bigger than " + ConstantsTable.MAX_CRANE_NUM_FOR_ONE_FREIGHTER);
+        }
+        return (long) weightOrNumber * craneEfficiency / craneNumber;
     }
 
 
     /**
-     * 生成实际的卸货时间（带有随机值的毫秒值）
+     * 【时间片】生成实际的卸货时间（带有随机值的毫秒值）
      *
      * @param estimatedStopTime 处理货物需要的理论时间（ms）
      * @return 处理货物需要的【实际】时间（ms）
@@ -83,7 +91,7 @@ public class InfoGenerator {
 
     /**
      * 生成随机的货物类型，货物的类型存储在TypeGoods类中
-     * @return
+     * @return 随机货物类型
      */
     public static TypeGoods randomTypeGoods() {
         int randomIndex = new Random().nextInt(TypeGoods.class.getEnumConstants().length);
