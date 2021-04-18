@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class StatisticalModels {
 
@@ -208,7 +207,7 @@ public class StatisticalModels {
             if ((lastFreighters != null) && (currentTotalCost > lastTotalCost)) {
                 // 注意，要用这种方式替换（下面两行），否则会可能导致数组大小异常！
 //                freighters.clear();
-//                freighters.addAll(lastFreighters);
+//                freighters.addAll(lastFreighters); 好吧，这样会出错。。。。
                 freighters = lastFreighters;
 
                 // 将上一情况的起重机数量返回（最优情况）
