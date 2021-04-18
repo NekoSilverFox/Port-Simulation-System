@@ -72,7 +72,7 @@ public class ConstantsTable {
     public static final String TIME_TYPE = "MM:dd:HH:mm";
 
     /** 线程等待时间 */
-    public static final int DEFAULT_SLEEP_MS = 1000;
+    public static final int DEFAULT_SLEEP_MS = 5;
 
     /** 表头底线 */
     public static final String TABLE_LINE = "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";

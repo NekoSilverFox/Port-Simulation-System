@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class StatisticalModels {
 
@@ -178,19 +179,18 @@ public class StatisticalModels {
                             finalCurrentFreighters.get(finalI + currentThreadID).setFine(totalFineNextFreighters);
                         }
 
-                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
-/*                    try {
-//                        Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
-                    lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
-
                         /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 把当前船的状态设置为 “已卸货” ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
                         finalCurrentFreighters.get(finalI).setUnload(true);
 
                     });  // 进程快结束
 
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                    try {
+                        System.out.println("Number crane: " + numThreadOrCrane + " Processing：No." + i);
+                        lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 } // for 循环结束
 
             } // 同步块结束
@@ -212,7 +212,7 @@ public class StatisticalModels {
                 freighters = lastFreighters;
 
                 // 将上一情况的起重机数量返回（最优情况）
-                return (numThreadOrCrane /*- 1*/);
+                return (numThreadOrCrane - 1);
             }
 
 
