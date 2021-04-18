@@ -68,6 +68,9 @@ public class ConstantsTable {
     /** 默认Json文件的存储位置 */
     public static final String JSON_FILE_PATH = "port-system\\src\\main\\java\\com\\foxthere\\data\\TimeTable.json";
 
+    /** 默认 Result 结果(Json文件)存储位置 */
+    public static final String RESULT_FILE_PATH = "port-system\\src\\main\\java\\com\\foxthere\\data\\Result.json";
+
     /** 时间格式 */
     public static final String TIME_TYPE = "MM:dd:HH:mm";
 

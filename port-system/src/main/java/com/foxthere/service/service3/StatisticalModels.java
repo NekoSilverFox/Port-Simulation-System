@@ -184,7 +184,7 @@ public class StatisticalModels {
 
                     });  // 进程快结束
 
-                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
                     try {
                         System.out.println("Number crane: " + numThreadOrCrane + " Processing：No." + i);
                         lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
