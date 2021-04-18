@@ -74,7 +74,7 @@ public class StatisticalModels {
     }
 
     public static int getMinCraneNumber(ArrayList<Freighter> freighters) {
-        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  变量区 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 变量区 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
         // 线程的数量（某种起重机的数量）
         int numThreadOrCrane = ConstantsTable.CRANE_INITIAL_NUM;
 
@@ -82,10 +82,10 @@ public class StatisticalModels {
         ExecutorService executorService = Executors.newFixedThreadPool(numThreadOrCrane);
 
         // 当前情况的总金额（总罚金 + 起重机的钱）
-        long currentTotalCost = ConstantsTable.CRANE_PRICE * numThreadOrCrane;
+        long currentTotalCost = 0;
 
         // 上一个情况的总金额（总罚金 + 起重机的钱）
-        long lastTotalCost = 0;
+        long lastTotalCost = ConstantsTable.CRANE_PRICE * numThreadOrCrane;
 
         // 当前队列
         ArrayList<Freighter> currentFreighters = null;
@@ -102,78 +102,92 @@ public class StatisticalModels {
             // 首先将船舶的队伍进行备份，避免在处理计算时影响原队列出错
             currentFreighters = freighters;
 
-            synchronized (lockObj) {
 
                 /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  numThreadOrCrane的情况处理开始，计算必要的信息 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
                 for (int i = 0; i < currentFreighters.size(); i++) {
 
+            synchronized (lockObj) {
+                    ArrayList<Freighter> finalCurrentFreighters = currentFreighters;
+                    int finalI = i;
+
                     executorService.submit(() -> {
 
+                        int currentThreadID = (int) Thread.currentThread().getId();
+
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  计算是否使用 2 台起重机 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                         * 如果数组不越界，并且 【当前船使用两台起重机的处理完成时刻(点) < 下一艘船的到达时刻(点)】，那么给他分配两台起重机（也就是需要把原本的卸货时间除以2）
+                         * 其中 【当前船使用两台起重机的处理完成时刻(点) == 当前船的实际到达时间(片) + 因为前面船的延误时间(片) + 使用两台起重机的处理完成时间(片)】
+                         * unloadingTimeIfUse2Crane -> 如果使用两台起重机的话，卸货结束时刻(点)
+                         */
+                        long unloadingTimeIfUse2Crane = finalCurrentFreighters.get(finalI).getActualArrivalTime()
+                                + finalCurrentFreighters.get(finalI).getActualStopTime()
+                                + (finalCurrentFreighters.get(finalI).getEstimatedStopTime() / 2);
+                        if (
+                                ((finalI + currentThreadID) < finalCurrentFreighters.size())
+                                        && (unloadingTimeIfUse2Crane > finalCurrentFreighters.get(finalI + currentThreadID).getActualArrivalTime())
+                        ) {
+                            // 将理论卸货时间折半
+                            finalCurrentFreighters.get(finalI).setEstimatedStopTime(
+                                    finalCurrentFreighters.get(finalI).getEstimatedStopTime() / 2
+                            );
+
+                            // 将实际卸货时间折半
+                            finalCurrentFreighters.get(finalI).setActualStopTime(
+                                    finalCurrentFreighters.get(finalI).getActualStopTime() / 2
+                            );
+
+                            // 重新计算罚金并赋值
+                            finalCurrentFreighters.get(finalI).setFine(
+                                    (int) ((finalCurrentFreighters.get(finalI).getActualStopTime() - finalCurrentFreighters.get(finalI).getEstimatedStopTime())
+                                            / 1000 / 60 / 60 * ConstantsTable.FINE_EVERY_HOUR)
+                            );
+                        }
+
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的等待时间 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                         * 本艘船的等待时间 = (上艘船的实际卸货时间 - 理论卸货时间) + 原本在队列中的等待时间
+                         */
+                        // 本艘船的等待时间
+                        long currentFreighterWaitingTime = 0;
+                        if ((finalI + currentThreadID) < finalCurrentFreighters.size()) {
+                            currentFreighterWaitingTime =
+                                    (finalCurrentFreighters.get(finalI).getActualStopTime() - finalCurrentFreighters.get(finalI).getEstimatedStopTime())
+                                            + finalCurrentFreighters.get(finalI + currentThreadID).getWaitingTimeInQueue();
+
+                            // 设置本线程要处理的下一艘的等待时间（由上面计算得到）
+                            finalCurrentFreighters.get(finalI + currentThreadID).setWaitingTimeInQueue(currentFreighterWaitingTime);
+                        }
 
 
-                    int currentThreadID = (int) Thread.currentThread().getId();
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的罚金 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+                         * 我觉得这块不太对！！
+                         */
+                        if (
+                                (currentFreighterWaitingTime > 0)
+                                        && ((finalI + currentThreadID) > finalCurrentFreighters.size())
+                        ) {
+                            // 本线程下艘要处理的船原来就已经有的罚金（因为起重机的超时工作）
+                            int fineAlreadyHaveNextFreighters = finalCurrentFreighters.get(finalI).getFine();
 
-                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  计算是否使用两台起重机 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-                     * 如果数组不越界，并且 【当前船使用两台起重机的处理完成时刻(点) < 下一艘船的到达时刻(点)】，那么给他分配两台起重机（也就是需要把原本的卸货时间除以2）
-                     * 其中 【当前船使用两台起重机的处理完成时刻(点) == 当前船的实际到达时间(片) + 因为前面船的延误时间(片) + 使用两台起重机的处理完成时间(片)】
-                     * unloadingTimeIfUse2Crane -> 如果使用两台起重机的话，卸货结束时刻(点)
-                     */
-                    long unloadingTimeIfUse2Crane = currentFreighters.get(i).getActualArrivalTime()
-                            + currentFreighters.get(i).getActualStopTime()
-                            + (currentFreighters.get(i).getEstimatedStopTime() / 2);
-                    if (
-                            ((i + currentThreadID) < currentFreighters.size())
-                                    && (unloadingTimeIfUse2Crane > currentFreighters.get(i + currentThreadID).getActualArrivalTime())
-                    ) {
-                        currentFreighters.get(i).setActualStopTime(
-                                currentFreighters.get(i).getActualStopTime() / 2
-                        );
-                    }
+                            // 为了便于计算，把等待的时间（毫秒值）转化为小时
+                            int finalWaitingHoursNextFreighters = (int) (currentFreighterWaitingTime / 1000 / 60 / 60);
 
-                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的等待时间 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-                     * 本艘船的等待时间 = (上艘船的实际卸货时间 - 理论卸货时间) + 原本在队列中的等待时间
-                     */
-                    // 本艘船的等待时间
-                    long currentFreighterWaitingTime = 0;
-                    if ((i + currentThreadID) < currentFreighters.size()) {
-                        currentFreighterWaitingTime =
-                                (currentFreighters.get(i).getEstimatedStopTime() - currentFreighters.get(i).getActualStopTime())
-                                        + currentFreighters.get(i + currentThreadID).getWaitingTimeInQueue();
+                            // 【最终罚金】 == 原罚金 + 加上因为在队列中等待而产生的新罚金
+                            int totalFineNextFreighters = fineAlreadyHaveNextFreighters
+                                    + finalWaitingHoursNextFreighters * ConstantsTable.FINE_EVERY_HOUR;
 
-                        // 设置本线程要处理的下一艘的等待时间（由上面计算得到）
-                        currentFreighters.get(i + currentThreadID).setWaitingTimeInQueue(currentFreighterWaitingTime);
-                    }
+                            finalCurrentFreighters.get(finalI + currentThreadID).setFine(totalFineNextFreighters);
+                        }
 
-                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 计算船舶的罚金 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-                     * 我觉得这块不太对！！
-                     */
-                    if (
-                            (currentFreighterWaitingTime > 0)
-                                    && ((i + currentThreadID) > currentFreighters.size())
-                    ) {
-                        // 本线程下艘要处理的船原来就已经有的罚金（因为起重机的超时工作）
-                        int fineAlreadyHaveNextFreighters = freighters.get(i).getFine();
-
-                        // 为了便于计算，把等待的时间（毫秒值）转化为小时
-                        int finalWaitingHoursNextFreighters = (int) (currentFreighterWaitingTime / 1000 / 60 / 60);
-
-                        // 【最终罚金】 == 原罚金 + 加上因为在队列中等待而产生的新罚金
-                        int totalFineNextFreighters = fineAlreadyHaveNextFreighters
-                                + finalWaitingHoursNextFreighters * ConstantsTable.FINE_EVERY_HOUR;
-
-                        currentFreighters.get(i + currentThreadID).setFine(totalFineNextFreighters);
-                    }
-
-                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
-                    try {
-                        Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
-//                    lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 让线程睡眠一会 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+/*                    try {
+//                        Thread.sleep(ConstantsTable.DEFAULT_SLEEP_MS);
+                    lockObj.wait(ConstantsTable.DEFAULT_SLEEP_MS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
-                    /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 把当前船的状态设置为 “已卸货” ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
-                    currentFreighters.get(i).setUnload(true);
+                        /** ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 把当前船的状态设置为 “已卸货” ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+                        finalCurrentFreighters.get(finalI).setUnload(true);
 
                     });  // 进程快结束
 
@@ -191,13 +205,14 @@ public class StatisticalModels {
             }
 
             // 当 【当前情况的总金额 > 上一个情况的总金额】 时，那么上一个情况便为最优解，也就是花费最小的情况，此时应当终止程序并将参数中的集合给覆盖
-            if (currentTotalCost > lastTotalCost) {
+            if ((lastFreighters != null) && (currentTotalCost > lastTotalCost)) {
                 // 注意，要用这种方式替换（下面两行），否则会可能导致数组大小异常！
-                freighters.clear();
-                freighters.addAll(lastFreighters);
+//                freighters.clear();
+//                freighters.addAll(lastFreighters);
+                freighters = lastFreighters;
 
                 // 将上一情况的起重机数量返回（最优情况）
-                return (numThreadOrCrane - 1);
+                return (numThreadOrCrane /*- 1*/);
             }
 
 
@@ -208,11 +223,11 @@ public class StatisticalModels {
             // 当前迭代完毕，将当前状况的总金额赋值到上一个情况（也就是说开始新情况了，现在的current情况 变成了 last情况）
             lastTotalCost = currentTotalCost;
 
-            // 当起重机数量为 numThreadOrCrane 的情况计算完毕，进行 +1 操作。准备进行下一种情况的计算
-            numThreadOrCrane++;
-
             // 初始化金额（只有起重机的总花费）
             currentTotalCost = (long) ConstantsTable.CRANE_PRICE * numThreadOrCrane;
+
+            // 当起重机数量为 numThreadOrCrane 的情况计算完毕，进行 +1 操作。准备进行下一种情况的计算
+            numThreadOrCrane++;
 
             // 重置线程池
             executorService.shutdownNow();
@@ -258,7 +273,7 @@ public class StatisticalModels {
             }
 
             averageUnloadingDelayTime += (freighter.getActualStopTime() - freighter.getEstimatedStopTime());
-            averageTimeOfUnloading += freighter.getActualStopTime();
+            averageTimeOfUnloading += freighter.getWaitingTimeInQueue();
             totalFine += freighter.getFine();
 
         }
@@ -297,10 +312,10 @@ public class StatisticalModels {
 
         System.out.println(String.format("%-20s", results.getNumCrane())
                 + String.format("%-25s", results.getNumFreighters())
-                + String.format("%-35s", results.getAverageWaitingTimeInQueue() / 1000 / 60 / 60 + " min")
-                + String.format("%-35s", results.getMaxUnloadingDelayTime() / 1000 / 60 / 60 + " min")
-                + String.format("%-35s", results.getAverageUnloadingDelayTime() / 1000 / 60 / 60 + " min")
-                + String.format("%-35s", results.getAverageTimeOfUnloading() / 1000 / 60 / 60 + " min")
+                + String.format("%-35s", results.getAverageWaitingTimeInQueue() / 1000 / 60 + " min")
+                + String.format("%-35s", results.getMaxUnloadingDelayTime() / 1000 / 60 + " min")
+                + String.format("%-35s", results.getAverageUnloadingDelayTime() / 1000 / 60 + " min")
+                + String.format("%-35s", results.getAverageTimeOfUnloading() / 1000 / 60 + " min")
                 + String.format("%-25s", "$" + results.getTotalFine())
         );
 

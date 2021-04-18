@@ -29,18 +29,45 @@ public class Test {
 //        write();
 //        read();
         springTest();
-
+//        test();
     }
 
+    public static void test() throws IOException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
+
+        // 生成并写入
+/*        JsonManager.jsonWriter(
+                context.getBean("freighterTimetable", FreighterTimetable.class)
+                        .createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION),
+                ConstantsTable.JSON_FILE_PATH);*/
+
+        FreighterTimetable freighterTimetable = context.getBean("freighterTimetable", FreighterTimetable.class);
+
+        freighterTimetable.setFreighterList(JsonManager.jsonReader(ConstantsTable.JSON_FILE_PATH));
+
+        System.out.println("\n\n");
+
+        ArrayList<Freighter> containerships = freighterTimetable.getContainershipList();
+        int minCraneContainerships = StatisticalModels.getMinCraneNumber(containerships);
+        StatisticalResults containershipsResults = StatisticalModels.getStatistics(containerships);
+        containershipsResults.setNumCrane(minCraneContainerships);
+
+        FreighterTimetable.printFreighterTimetable(containerships, ConstantsTable.TIME_TYPE);
+
+        StatisticalModels.printStatistics(containershipsResults, "Results-Containerships");
+        System.out.println("\n");
+
+        System.exit(0);
+    }
 
     public static void springTest() throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("ApplicationContext.xml");
 
         // 生成并写入
-        JsonManager.jsonWriter(
+/*        JsonManager.jsonWriter(
                 context.getBean("freighterTimetable", FreighterTimetable.class)
                         .createFreighterList(ConstantsTable.FREIGHTER_ARRIVAL_INTERVAL, ConstantsTable.DURATION_SIMULATION),
-                ConstantsTable.JSON_FILE_PATH);
+                ConstantsTable.JSON_FILE_PATH);*/
 
         FreighterTimetable freighterTimetable = context.getBean("freighterTimetable", FreighterTimetable.class);
 
@@ -49,7 +76,7 @@ public class Test {
 /*        Freighter freighterByTerminal = StatisticalModels.createFreighterByTerminal();
         freighterTimetable.addFreighter(freighterByTerminal);*/
 
-        freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
+//        freighterTimetable.printAllFreighterTimetable(ConstantsTable.TIME_TYPE);
 
         System.out.println("\n\n");
 
@@ -96,7 +123,7 @@ public class Test {
 
         StatisticalModels.printStatistics(totalResults, "Results-AllFreighters");
         System.out.println("\n");
-//        System.exit(0);
+        System.exit(0);
     }
 
     public static void write() throws IOException {
