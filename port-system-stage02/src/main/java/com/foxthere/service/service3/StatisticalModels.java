@@ -10,17 +10,19 @@
  */
 package com.foxthere.service.service3;
 
-import com.foxthere.pojo.defines.ConstantsTable;
-import com.foxthere.pojo.defines.Freighter;
-import com.foxthere.pojo.defines.StatisticalResults;
-import com.foxthere.pojo.defines.TypeGoods;
+import com.foxthere.model.ConstantsTable;
+import com.foxthere.model.Freighter;
+import com.foxthere.model.StatisticalResults;
+import com.foxthere.model.TypeGoods;
 import com.foxthere.service.service1.InfoGenerator;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Service
 public class StatisticalModels {
 
     public static Freighter createFreighterByTerminal() {
