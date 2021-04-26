@@ -65,11 +65,14 @@ public class ConstantsTable {
     /** 船舶尾部的n位随机数字 */
     public static final int NUM_DIGITS_END_OF_NAME = 3;
 
+    /** 存放Json文件的文件夹位置 */
+    public static final String JSON_FILE_SAVE_PATH = "C:\\Users\\mi\\Desktop\\Programma\\Port-Simulation-System\\port-system-stage02\\src\\main\\java\\com\\foxthere\\data\\";
+
     /** 默认Json文件的存储位置 */
-    public static final String JSON_FILE_PATH = "port-system-stage02\\src\\main\\java\\com\\foxthere\\data\\TimeTable.json";
+    public static final String JSON_FILE_PATH = "C:\\Users\\mi\\Desktop\\Programma\\Port-Simulation-System\\port-system-stage02\\src\\main\\java\\com\\foxthere\\data\\TimeTable.json";
 
     /** 默认 Result 结果(Json文件)存储位置 */
-    public static final String RESULT_FILE_PATH = "port-system-stage02\\src\\main\\java\\com\\foxthere\\data\\Result.json";
+    public static final String RESULT_FILE_PATH = "C:\\Users\\mi\\Desktop\\Programma\\Port-Simulation-System\\port-system-stage02\\src\\main\\java\\com\\foxthere\\data\\StatisticalResults.json";
 
     /** 时间格式 */
     public static final String TIME_TYPE = "MM:dd:HH:mm";
@@ -79,5 +82,4 @@ public class ConstantsTable {
 
     /** 表头底线 */
     public static final String TABLE_LINE = "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-
 }

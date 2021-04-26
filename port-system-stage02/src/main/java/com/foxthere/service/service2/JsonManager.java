@@ -13,6 +13,7 @@ package com.foxthere.service.service2;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foxthere.model.Freighter;
+import com.foxthere.model.StatisticalResults;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -53,6 +54,34 @@ public class JsonManager {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(new FileWriter(filePath), freighterArrayList);
+    }
+
+
+    public static void jsonStatisticalResultsWriter(ArrayList<StatisticalResults> resultsArrayList, String filePath) throws IOException {
+        File file = new File(filePath);
+
+        if (filePath.isEmpty() || !filePath.toLowerCase(Locale.ROOT).endsWith(".json")) {
+            throw new FileNotFoundException("[ERROR] File path is empty or not a Json file");
+        }else if (!file.exists()) {
+            // 如果文件不存在就创建一个
+            String[] split = filePath.split("\\\\");
+            long count = Stream.of(split).count();
+
+            if (count == 1) {
+                file.createNewFile();
+            } else {
+                StringBuffer dirPath = new StringBuffer();
+                for (int i = 0; i < count - 1; i++) {
+                    dirPath.append(split[i]).append("\\\\");
+                }
+
+                new File(dirPath.toString()).mkdirs();
+                file.createNewFile();
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(new FileWriter(filePath), resultsArrayList);
     }
 
     /**

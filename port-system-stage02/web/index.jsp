@@ -11,6 +11,16 @@
     <title>$Title$</title>
   </head>
   <body>
-  $END$
+<%--  $END$--%>
+  <div class="elementor-icon-box-wrapper">
+    <div class="elementor-icon-box-content">
+      <h3 class="elementor-icon-box-title">
+        <a href="https://foxthere.com/post-simulation-system/" target="_blank">Click here to go to the console</a>
+      </h3>
+      <p class="elementor-icon-box-description">================================》</p>
+    </div>
+  </div>
+
+
   </body>
 </html>

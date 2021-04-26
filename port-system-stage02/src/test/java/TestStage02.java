@@ -25,9 +25,9 @@ import java.util.ArrayList;
 public class TestStage02 {
 
     public static void main(String[] args) throws IOException {
-//        write();
+        write();
 //        read();
-        springTest();
+//        springTest();
 //        test();
     }
 
@@ -106,6 +106,23 @@ public class TestStage02 {
                 (containershipsResults.getAverageTimeOfUnloading() + bulkCarriersResults.getAverageTimeOfUnloading() + tankersResults.getAverageTimeOfUnloading()) / 3,
                 containershipsResults.getTotalFine() + bulkCarriersResults.getTotalFine() + tankersResults.getTotalFine()
         );
+
+
+
+        ArrayList<StatisticalResults> resultsArrayList = new ArrayList<>();
+        resultsArrayList.add(containershipsResults);
+        resultsArrayList.add(bulkCarriersResults);
+        resultsArrayList.add(tankersResults);
+        resultsArrayList.add(totalResults);
+        try {
+            JsonManager.jsonStatisticalResultsWriter(resultsArrayList, ConstantsTable.RESULT_FILE_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
 
         FreighterTimetable.printFreighterTimetable(containerships, ConstantsTable.TIME_TYPE);
         FreighterTimetable.printFreighterTimetable(bulkCarriers, ConstantsTable.TIME_TYPE);
