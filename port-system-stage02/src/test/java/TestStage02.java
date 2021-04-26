@@ -25,9 +25,9 @@ import java.util.ArrayList;
 public class TestStage02 {
 
     public static void main(String[] args) throws IOException {
-        write();
+//        write();
 //        read();
-//        springTest();
+        springTest();
 //        test();
     }
 
