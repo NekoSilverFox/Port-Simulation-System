@@ -16,6 +16,7 @@ import com.foxthere.model.Freighter;
 import com.foxthere.model.StatisticalResults;
 import com.foxthere.service.service1.FreighterTimetable;
 import com.foxthere.service.service2.JsonManager;
+import com.foxthere.unit.ErrorJump;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -24,6 +25,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -85,11 +89,12 @@ public class Controller2 {
      */
     @GetMapping("/getFreighterTimetableByPath/{jsonFileName}")
     @ResponseBody
-    public FreighterTimetable getFreighterTimetableByPath(@PathVariable String jsonFileName) throws FileNotFoundException {
+    public FreighterTimetable getFreighterTimetableByPath(@PathVariable String jsonFileName) throws IOException {
         System.out.println("[INFO] Getting Freighter Timetable by path from the URL `http://localhost:8080/controller2/getFreighterTimetableByPath/" + jsonFileName + "`");
 
         if (jsonFileName.isEmpty() || !jsonFileName.toLowerCase().endsWith(".json")) {
-//            throw new FileNotFoundException("[ERROR] File is empty or not a Json file");  TODO 返回一个 404 错误？
+            System.out.println("[ERROR] " + jsonFileName + " file is empty or is not a Json file");
+            ErrorJump.throwError();
             return null;
         }
 
@@ -98,6 +103,7 @@ public class Controller2 {
 
         if (!(new File(jsonFilePath).exists())) {
             System.out.println("[ERROR] File does not exist " + jsonFilePath);
+            ErrorJump.throwError();
             return null;
         }
 
@@ -189,18 +195,15 @@ public class Controller2 {
 
 
 
-//    @PostMapping("postStatisticalResultsToJsonFile")
-
     /** 【通过POST】http://localhost:8080/controller2/postStatisticalResultsToJsonFile
      * 将 post 过来的数据保存在json文件中
-     * TODO 并通过视图解析器返回表格到浏览器？因为要用 Model 所以调试完再添加这个功能
-     * @param resultsArrayList
+     * @param resultsArrayList 要保存的数据
      * @return
      */
-    @RequestMapping("/postStatisticalResultsToJsonFile")
+    @PostMapping("postStatisticalResultsToJsonFile")
+//    @RequestMapping("/postStatisticalResultsToJsonFile")
     @ResponseBody
     public ArrayList<StatisticalResults> postStatisticalResultsToJsonFile(@RequestBody ArrayList<StatisticalResults> resultsArrayList) {
-//    public String postStatisticalResultsToJsonFile(@RequestBody ArrayList<StatisticalResults> resultsArrayList, Model model) {
 
         try {
             JsonManager.jsonStatisticalResultsWriter(resultsArrayList, ConstantsTable.RESULT_FILE_PATH);
@@ -208,12 +211,9 @@ public class Controller2 {
             e.printStackTrace();
         }
 
-//        model.addAttribute("msg", resultsArrayList.toString());
-        System.out.println("--------------------------------------postStatisticalResultsToJsonFile---------------------------------");
+        System.out.println("---------------------------- postStatisticalResultsToJsonFile ----------------------------");
         System.out.println(resultsArrayList);
 
         return resultsArrayList;
-//        return "forward:/WEB-INF/jsp/info.jsp";  // 加了 `forward:`前缀，代表转发
-//        return "info";
     }
 }

@@ -213,7 +213,7 @@ public class StatisticalModels {
                 freighters = lastFreighters;
 
                 // 将上一情况的起重机数量返回（最优情况）
-                return (numThreadOrCrane - 1);
+                return (numThreadOrCrane/* - 1*/);
             }
 
 
