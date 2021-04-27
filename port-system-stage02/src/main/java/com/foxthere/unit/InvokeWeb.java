@@ -1,19 +1,22 @@
 /**
  * -*- coding: utf-8 -*-
  *
- * @Time : 2021/4/27 0:40
+ * @Time : 2021/4/27 8:35
  * @Author : NekoSilverfox
- * @FileName: ErrorJump
+ * @FileName: InvokeWeb
  * @Software: IntelliJ IDEA
- * @Versions: v1.0
+ * @Versions: v0.1
  * @Github ：https://github.com/NekoSilverFox
  */
 package com.foxthere.unit;
 
-public class ErrorJump{
-    public static void throwError() {
+public class InvokeWeb {
+    public static void invoke(String url) {
+        if (url == null || url.isEmpty()) {
+            throw new NullPointerException("[ERROR] URL can not be enpty");
+        }
+
         try {
-            String url = "https://foxthere.com/error";
             java.net.URI uri = java.net.URI.create(url);
 
             // 获取当前系统桌面扩展

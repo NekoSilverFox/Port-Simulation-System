@@ -72,7 +72,7 @@
         var aveU = "    ▶  Max unloading delay time:  " + parseInt(date[i].averageUnloadingDelayTime / ms2min) + " min";
         var aveW = "    ▶  Average unloading delay time:  " + parseInt(date[i].averageWaitingTimeInQueue / ms2min) + " min";
         var maxU = "    ▶  Average time of unloading:  " + parseInt(date[i].maxUnloadingDelayTime / ms2min) + " min";
-        var totF = "    ▶  Total fine:  " + parseInt(date[i].totalFine) + " min";
+        var totF = "    ▶  Total fine:  " + parseInt(date[i].totalFine);
         var resultMsg =
               numC + " \n "
             + numF + " \n "

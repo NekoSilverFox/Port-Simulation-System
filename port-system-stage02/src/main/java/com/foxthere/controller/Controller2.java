@@ -164,7 +164,7 @@ public class Controller2 {
     }
 
 
-    /** http://localhost:8080/controller2/getBulkCarrierTimetable
+    /** http://localhost:8080/controller2/getTankerTimetable
      * @return 按照Json文件的默认路径，返回一个 散货船 的时刻表
      */
     @GetMapping("/getTankerTimetable")
