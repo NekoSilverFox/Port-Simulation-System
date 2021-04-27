@@ -1,7 +1,5 @@
 package com.foxthere.model;
 
-import org.springframework.stereotype.Component;
-
 /**
  * @author Silverfox
  */

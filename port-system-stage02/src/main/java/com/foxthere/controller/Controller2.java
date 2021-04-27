@@ -5,7 +5,7 @@
  * @Author : NekoSilverfox
  * @FileName: Controller2
  * @Software: IntelliJ IDEA
- * @Versions: v0.1
+ * @Versions: v1.0
  * @Github ：https://github.com/NekoSilverFox
  */
 package com.foxthere.controller;
@@ -21,15 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 

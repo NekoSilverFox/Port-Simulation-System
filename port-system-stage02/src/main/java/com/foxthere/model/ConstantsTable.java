@@ -5,7 +5,7 @@
  * @Author : NekoSilverfox
  * @FileName: ConstantsTable
  * @Software: IntelliJ IDEA
- * @Versions: v0.1
+ * @Versions: v1.0
  * @Github ：https://github.com/NekoSilverFox
  */
 package com.foxthere.model;
