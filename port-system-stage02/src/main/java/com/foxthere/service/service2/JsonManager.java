@@ -25,6 +25,8 @@ import java.util.stream.Stream;
 public class JsonManager {
     /**
      * 将存储船舶的 ArrayList 写入到 json 文件中
+     * Запись списка ArrayList хранимых судов в json-файл
+     *
      * @param freighterArrayList 将存储船舶的 ArrayList
      * @param filePath 写入的路径
      * @throws IOException 文件无法创建或路径错误
@@ -86,6 +88,8 @@ public class JsonManager {
 
     /**
      * 从 json 文件中，读取存储船舶的 ArrayList
+     * Из файла json прочитайте список ArrayList, в котором хранится корабль
+     *
      * @param filePath 读取的路径
      * @return 读取到的 ArrayList
      * @throws IOException 文件打开

@@ -10,9 +10,6 @@
  */
 package com.foxthere.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foxthere.model.ConstantsTable;
 import com.foxthere.model.Freighter;
 import com.foxthere.model.StatisticalResults;
@@ -43,7 +40,12 @@ public class Controller3 {
     /** http://localhost:8080/controller3/generateSimulationResults
      * 从 controller2/getFreighterTimetable 中获取一个船舶的时间表并且计算建模
      * 注意：这里不会写入到任何文件中
+     *
+     * Получение расписания судна из controller2/getFreighterTimetable и расчет моделирования
+     * Примечание: Это не будет записано ни в какой файл
+     *
      * @return 返回 包含一个包含 3种 类型船的队列 和 总和 的 ArrayList 数组
+     * @return возвращает массив ArrayList, содержащий очередь из 3 типов кораблей и сумму
      */
     @GetMapping("generateSimulationResults")
     @ResponseBody
@@ -125,7 +127,12 @@ public class Controller3 {
     /** http://localhost:8080/controller3/generateSimulationResults
      * 从 controller2/getFreighterTimetable 中获取一个船舶的时间表并且计算建模
      * 注意：这里不会写入到任何文件中
+     *
+     * Получение расписания судна из controller2/getFreighterTimetable и расчет моделирования
+     * Примечание: Это не будет записано ни в какой файл
+     *
      * @return 返回 包含一个包含 3种 类型船的队列 和 总和 的 ArrayList 数组
+     * @return возвращает массив ArrayList, содержащий очередь из 3 типов кораблей и сумму
      */
     @GetMapping("generateSimulationResults/{jsonFileName}")
     @ResponseBody
@@ -232,6 +239,6 @@ public class Controller3 {
 //        }
 
         model.addAttribute("msg", result);
-        return "info";
+        return "result";
     }
 }

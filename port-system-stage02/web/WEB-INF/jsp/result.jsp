@@ -8,8 +8,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Result</title>
 </head>
+
 <body>
     <p style="text-align: left;"><strong>GitHub：</strong>NekoSilverfox</p>
     <p style="text-align: left;"><strong>ИФО：</strong>Мэн Цзянин</p>

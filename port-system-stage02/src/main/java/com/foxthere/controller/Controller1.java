@@ -36,6 +36,7 @@ public class Controller1 {
 
     /** http://localhost:8080/controller1/createFreighterTimetable
      * @return 生成一个所有船舶的时刻表，并返回；并通过 服务2 写入到 TimeTable.json 中
+     * @return генерирует расписание всех кораблей и возвращает его; и записывает его в TimeTable.json через service2
      */
     @GetMapping("/createFreighterTimetable")
     @ResponseBody

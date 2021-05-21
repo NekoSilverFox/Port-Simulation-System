@@ -58,6 +58,7 @@ public class Controller2 {
 
     /** http://localhost:8080/controller2/getFreighterTimetable
      * @return 按照Json文件的默认路径，返回一个所有船舶的时刻表
+     * @return возвращает расписание всех кораблей в соответствии с путем по умолчанию к Json-файлу.
      */
     @GetMapping("/getFreighterTimetable")
     @ResponseBody
@@ -82,6 +83,7 @@ public class Controller2 {
 
     /** http://localhost:8080/controller2/getFreighterTimetableByPath
      * @return 按照用户给定Json文件路径，返回一个所有船舶的时刻表
+     * @return возвращает расписание всех судов в соответствии с путем к Json-файлу, указанному пользователем.
      */
     @GetMapping("/getFreighterTimetableByPath/{jsonFileName}")
     @ResponseBody
@@ -122,6 +124,7 @@ public class Controller2 {
 
     /** http://localhost:8080/controller2/getContainershipTimetable
      * @return 按照Json文件的默认路径，返回一个 集装箱船 的时刻表
+     * @return возвращает расписание движения контейнеровозов в соответствии со стандартным путем к Json-файлу.
      */
     @GetMapping("/getContainershipTimetable")
     @ResponseBody
@@ -146,6 +149,7 @@ public class Controller2 {
 
     /** http://localhost:8080/controller2/getBulkCarrierTimetable
      * @return 按照Json文件的默认路径，返回一个 液体船 的时刻表
+     * @return возвращает расписание для жидкого судна, следуя пути по умолчанию к Json-файлу.
      */
     @GetMapping("/getBulkCarrierTimetable")
     @ResponseBody
@@ -170,6 +174,7 @@ public class Controller2 {
 
     /** http://localhost:8080/controller2/getTankerTimetable
      * @return 按照Json文件的默认路径，返回一个 散货船 的时刻表
+     * @return возвращает расписание для балкера, следуя пути по умолчанию к Json-файлу.
      */
     @GetMapping("/getTankerTimetable")
     @ResponseBody
@@ -195,7 +200,9 @@ public class Controller2 {
 
     /** 【通过POST】http://localhost:8080/controller2/postStatisticalResultsToJsonFile
      * 将 post 过来的数据保存在json文件中
-     * @param resultsArrayList 要保存的数据
+     * Сохраните опубликованные данные в json-файле
+     *
+     * @param resultsArrayList 要保存的数据  Данные для сохранения
      * @return
      */
     @PostMapping("postStatisticalResultsToJsonFile")

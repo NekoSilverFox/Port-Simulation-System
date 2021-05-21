@@ -44,7 +44,7 @@ public class Controller4 {
         InvokeWeb.invoke("http://localhost:8080/controller3/showInBrowser");
 
         model.addAttribute("msg", "Running");
-        return "SimpleMsg";
+        return "simpleMsg";
     }
 
     /** http://localhost:8080/controller4/startSimulation/{jsonFileName}
@@ -81,6 +81,6 @@ public class Controller4 {
 
 
         model.addAttribute("msg", "Running");
-        return "SimpleMsg";
+        return "simpleMsg";
     }
 }

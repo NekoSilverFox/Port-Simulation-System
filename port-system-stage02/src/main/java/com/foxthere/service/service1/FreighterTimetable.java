@@ -182,7 +182,7 @@ public class FreighterTimetable {
 
     /**
      * 获取【液货船】的总量
-     *
+     * Получить общее количество [наливных грузовых судов].
      * @return 获取货轮的总量（液货船）
      */
     public int tankerNumber() {
@@ -192,7 +192,7 @@ public class FreighterTimetable {
 
     /**
      * 平均等待时长
-     *
+     * Среднее время ожидания
      * @return 平均等待时长
      */
     public long averageWaitingTime() {
@@ -203,7 +203,7 @@ public class FreighterTimetable {
 
     /**
      * 所有类型货轮的总罚款
-     *
+     * Общая сумма штрафов для всех типов грузовых судов
      * @return 总罚款
      */
     public int allFreighterTotalFine() {
@@ -219,7 +219,7 @@ public class FreighterTimetable {
 
     /**
      * 所有集装箱货船的总罚款
-     *
+     * Общий штраф для всех контейнерных грузовых судов
      * @return 总罚款
      */
     public int containershipTotalFine() {
@@ -235,7 +235,7 @@ public class FreighterTimetable {
 
     /**
      * 所有散货船的总罚款
-     *
+     * Общий штраф для всех балкерных судов
      * @return 总罚款
      */
     public int bulkCarrierTotalFine() {
@@ -251,7 +251,7 @@ public class FreighterTimetable {
 
     /**
      * 所有液货船的总罚款
-     *
+     * Общий штраф для всех судов с наливными грузами
      * @return 总罚款
      */
     public int tankerTotalFine() {
@@ -267,7 +267,7 @@ public class FreighterTimetable {
 
     /**
      * 按照索引从所有货轮列表中获取货轮
-     *
+     * Получить грузовые суда из списка всех грузовых судов по индексу
      * @param index
      * @return
      */
@@ -293,11 +293,12 @@ public class FreighterTimetable {
 
     /**
      * 生成船的时刻表
-     * TODO 实现用动态规划生成时间等待
+     * Составление судового расписания
      *
-     * @param freighterArrivalInterval 平均每隔多久到一艘船
-     * @param durationSimulation       模拟的时长
+     * @param freighterArrivalInterval 平均每隔多久到一艘船 Как часто в среднем прибывает корабль
+     * @param durationSimulation       模拟的时长 Продолжительность симуляции
      * @return 生成的船的时刻表
+     * @return Составление расписания движения судов
      */
     public ArrayList<Freighter> createFreighterList(long freighterArrivalInterval, long durationSimulation) {
         System.out.println("[INFO] Start to create freighter time table");
@@ -370,6 +371,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【所有】货轮的时间表
+     * Печать расписания [всех] грузовых судов в виде списка
      *
      * @param timeType 显示时间的格式
      */
@@ -380,6 +382,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【集装箱】货轮的时间表
+     * Печать расписания грузовых судов [контейнеров] в виде списка
      *
      * @param timeType 显示时间的格式
      */
@@ -390,6 +393,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【散货船】的时间表
+     * Печать расписания [балкеров] в виде списка
      *
      * @param timeType 显示时间的格式
      */
@@ -400,6 +404,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印【液货船】的时间表
+     * Распечатать расписание [Наливное грузовое судно] в виде списка
      *
      * @param timeType 显示时间的格式
      */
@@ -409,6 +414,7 @@ public class FreighterTimetable {
 
     /**
      * 以列表的形式打印指定类型货轮的时间表
+     * Печать расписания для указанного типа грузового судна в формате списка
      *
      * @param freighterTimetable 存储货轮的 ArrayList
      * @param timeType           显示时间的格式
