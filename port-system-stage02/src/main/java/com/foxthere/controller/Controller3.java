@@ -206,7 +206,7 @@ public class Controller3 {
     public String showInBrowser(Model model) {
         if (!(new File(ConstantsTable.RESULT_FILE_PATH).exists())) {
             //return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            return null;
+            return "emptyFile";
         }
 
         int len = 0;

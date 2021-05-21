@@ -3,14 +3,14 @@
  *
  * @Time : 2021/4/27 0:40
  * @Author : NekoSilverfox
- * @FileName: ErrorJump
+ * @FileName: ErrorHandle
  * @Software: IntelliJ IDEA
  * @Versions: v1.0
  * @Github ：https://github.com/NekoSilverFox
  */
 package com.foxthere.unit;
 
-public class ErrorJump{
+public class ErrorHandle {
     public static void throwError() {
         try {
             String url = "https://foxthere.com/error";
@@ -31,4 +31,6 @@ public class ErrorJump{
             e.printStackTrace();
         }
     }
+
 }
+

@@ -16,13 +16,15 @@ import com.foxthere.model.Freighter;
 import com.foxthere.model.StatisticalResults;
 import com.foxthere.service.service1.FreighterTimetable;
 import com.foxthere.service.service2.JsonManager;
-import com.foxthere.unit.ErrorJump;
+import com.foxthere.unit.ErrorHandle;
+import com.foxthere.unit.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,8 +90,9 @@ public class Controller2 {
 
         if (jsonFileName.isEmpty() || !jsonFileName.toLowerCase().endsWith(".json")) {
             System.out.println("[ERROR] " + jsonFileName + " file is empty or is not a Json file");
-            ErrorJump.throwError();
-            return null;
+
+            /* Throw except */
+            throw new ResourceNotFoundException();
         }
 
         String jsonFilePath = ConstantsTable.JSON_FILE_SAVE_PATH + jsonFileName;
@@ -97,8 +100,9 @@ public class Controller2 {
 
         if (!(new File(jsonFilePath).exists())) {
             System.out.println("[ERROR] File does not exist " + jsonFilePath);
-            ErrorJump.throwError();
-            return null;
+
+            /* Throw except */
+            throw new ResourceNotFoundException();
         }
 
         ApplicationContext context = new AnnotationConfigApplicationContext(JavaConfig.class);

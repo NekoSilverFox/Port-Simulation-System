@@ -10,23 +10,15 @@
  */
 package com.foxthere.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foxthere.model.ConstantsTable;
-import com.foxthere.model.StatisticalResults;
-import com.foxthere.service.service3.StatisticalModels;
 import com.foxthere.unit.InvokeWeb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.FileReader;
 import java.util.concurrent.TimeUnit;
 
 @Controller
