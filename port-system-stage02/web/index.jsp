@@ -24,7 +24,7 @@
   <body>
     <%--  $END$--%>
     <h1 style="text-align:center;">
-      <span style="color:#337FE5;">Курсовая работа по Java</span>
+      <span style="color:#337FE5;"><br /><br />Курсовая работа по Java</span>
     </h1>
     <h2 style="text-align:center;">
       Мэн Цзянин<br />

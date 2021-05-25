@@ -20,7 +20,8 @@
     </h2>
 
     <p style="text-align:center;">
-        <span style="color:#E53333;background-color:#FFE500;"><img src="https://foxthere.com/wp-content/uploads/2020/01/404.jpg" /><br />
+        <span style="color:#E53333;background-color:#FFE500;"><img src="https://silverfoxcloud.com/wp-content/uploads/2021/05/404.jpg" /><br />
+<%--        <span style="color:#E53333;background-color:#FFE500;"><img src="https://foxthere.com/wp-content/uploads/2020/01/404.jpg" /><br />--%>
     </span>
     </p>
 </body>
